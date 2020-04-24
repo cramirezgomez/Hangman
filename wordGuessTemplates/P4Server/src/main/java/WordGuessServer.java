@@ -10,12 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundRepeat;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -66,6 +60,12 @@ HashMap<String, Scene> sceneMap;
 		portButton = new Button("Enter");
 		startServer = new Button("Start Server");
 		startServer.setDisable(true);
+		
+//		remove
+//		later
+//      ||||||
+//      VVVVVV
+		portNumber.setText("5555");
 		//-------------//
 		
 		//---Server GUI--//
@@ -113,7 +113,16 @@ HashMap<String, Scene> sceneMap;
 							-> Should'nt be as much information as the last project
 						*/
 						
-						//turnInfo = (MorraInfo) data;//<---
+						WordInfo input = (WordInfo) data;//<---
+						listItems.getItems().add(input.serverMessage);
+						
+						//client guessed a word
+						if(input.guess != ' ') {
+							listItems.getItems().add("Current Guess: " + input.guess);
+						}
+						if(input.category != 0) {
+							listItems.getItems().add("Category picked: " + input.category);
+						}
 						
 					});
 				}, socketPort);;
@@ -153,6 +162,7 @@ HashMap<String, Scene> sceneMap;
 		
 		startPane.setCenter(v3);
 		
+		/*
 		//Create an object for the background image    
 		 Image dogEin = new Image("startGui.jpg");
 			
@@ -163,7 +173,7 @@ HashMap<String, Scene> sceneMap;
 		            BackgroundRepeat.NO_REPEAT,
 		            BackgroundPosition.CENTER,
 		            aSize )));
-		
+		*/
 		return new Scene(startPane, 850, 750);
 	}
 	
@@ -173,7 +183,7 @@ HashMap<String, Scene> sceneMap;
 		BorderPane serverPane = new BorderPane();
 		serverPane.setCenter(listItems);
 		
-		//Create an object for the background image    
+		/*//Create an object for the background image    
 		Image edwardServer = new Image("serverGui.jpg");
 		
 	    //Set background size 
@@ -183,7 +193,7 @@ HashMap<String, Scene> sceneMap;
 	            BackgroundRepeat.NO_REPEAT,
 	            BackgroundPosition.CENTER,
 	            bSize )));
-		
+		*/
 		return new Scene(serverPane, 850, 750);
 	}
 

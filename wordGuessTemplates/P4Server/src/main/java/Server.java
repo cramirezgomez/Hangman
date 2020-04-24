@@ -3,20 +3,17 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.function.Consumer;
+
 
 
 public class Server {
 	
 	    //Creates a server 
+		int count = 1;	
+		ArrayList<ClientThread> clients = new ArrayList<ClientThread>();
 		TheServer server;
-		
-		//We do not need to keep track of an individual player 
-		MorraInfo infoP1;
-		
-		//Keeps track of the number of players 
-		int numPlayers;
-		
 		int portNum;
 		private Consumer<Serializable> callback;
 		
@@ -27,10 +24,6 @@ public class Server {
 			portNum = 5555;
 			this.server = new TheServer();
 			this.server.start();
-			
-			infoP1 = null; //Why was this made null?
-			
-			numPlayers = 0;
 		}
 		
 		//Default Constructor with custom port number 
@@ -40,7 +33,6 @@ public class Server {
 			this.portNum = port;
 			this.server = new TheServer();
 			this.server.start();
-			numPlayers = 0;
 		}
 		
 		
@@ -51,38 +43,26 @@ public class Server {
 			{
 				try(ServerSocket mysocket = new ServerSocket(portNum);)
 				{
+					System.out.println("Server is waiting for a client!");
 					//Looking for clients to connect 
 					while(true)
 					{
-							int tempNum = 0;
-							
-							ClientThread c = new ClientThread(mysocket.accept(), tempNum);
+						ClientThread c = new ClientThread(mysocket.accept(), count);
+						//callback.accept("client has connected to server: " + "client #" + count);
+						WordInfo temp = new WordInfo();
+						temp.serverMessage = "client has connected to server: " + "client #" + count;
+						callback.accept(temp);
+						clients.add(c);
+						c.start();
 						
-							c.count = 1;
-							System.out.println("open:p1");
-							
-							MorraInfo temp = new MorraInfo();
-							
-							temp.serMess = "new client " + c.count;
-							
-							numPlayers++;
-							temp.numPlayers = numPlayers;
-							
-							callback.accept(temp);
-							
-							playerOne = c; //<---
-							c.start();
-							System.out.println("recieved p1");	
-						
+						count++;
 					}
 				}
 				catch(Exception e) 
 				{
-					MorraInfo temp = new MorraInfo();
-					
-					temp.serMess = "Server socket didn't laucnh ";
+					WordInfo temp = new WordInfo();
+					temp.serverMessage = "Server socket didn't launch";
 					callback.accept(temp);
-					
 				}
 			}
 		}
@@ -107,24 +87,54 @@ public class Server {
 				used up and not mess around with the words of other clients. 
 			
 			*/
+			ArrayList<String> wordBank1;
+			ArrayList<String> wordBank2;
+			ArrayList<String> wordBank3;
+			String curWord;
+			WordInfo curTurn;
 			
 			ClientThread(Socket s, int count)
 			{
 				this.connection = s;
 				this.count = count;
+				wordBank1 = new ArrayList<String>();
+				wordBank2 = new ArrayList<String>();
+				wordBank3 = new ArrayList<String>();
+				resetWordBanks();
 			}
 			
-			//Send Information back to the client 
-			//Updates Clients with a MorraInfo object
-			public void updateClients(MorraInfo message)
+			void resetWordBanks()
 			{
-					try
-					{
-						message.curPlayer = 1;
-						playerOne.out.writeObject(message);
-					}
-					catch(Exception e) {}
+				wordBank1.clear();
+				wordBank2.clear();
+				wordBank3.clear();
+				
+				wordBank1.add("apple");
+				wordBank1.add("grapes");
+				wordBank1.add("pineapple");
+				
+				wordBank2.add("blue");
+				wordBank2.add("orange");
+				wordBank2.add("red");
+				
+				wordBank3.add("tiger");
+				wordBank3.add("zebra");
+				wordBank3.add("bear");
+				
+				curWord = " ";
+				curTurn = new WordInfo();
 			}
+			
+			//update one client
+			public void sendClientResponse(WordInfo message) 
+			{
+				try 
+				{
+					this.out.writeObject(message);
+				}
+				catch(Exception e) {}
+			}
+			
 			
 			//Called when start() is called 
 			public void run()
@@ -141,81 +151,79 @@ public class Server {
 				}
 				
 				
-				MorraInfo newClient = new MorraInfo();
-				newClient.numPlayers = numPlayers;
-				newClient.serMess = "new client on server: client #"+count;
-				updateClients(newClient);
+				WordInfo newClient = new WordInfo();
+				newClient.serverMessage = "new client on server: client #"+count;
+				sendClientResponse(newClient);
 				
 				
 				//while loop to read in from clients and update others
 				while(true)
 				{
 					
-				
-					MorraInfo resultsInfo = new MorraInfo();
-					
 					//Game Logic will be implemented here 
 					try 
 					{
-						if(count == 1)
-						{
-							infoP1 = (MorraInfo) in.readObject();
-							
-							System.out.println("playAGain: " + infoP1.playAgain);
-							if(infoP1.playAgain == 1)
-							{
-								infoP1.p1Plays = -1;
-								infoP1.playAgain = 0;
-								infoP1.serMess = "Player 1 wants to play again";
-								callback.accept(infoP1);
-								updateClients(infoP1);
-								infoP1 = null;
-								System.out.println("play again p1");
-							}
-							else if(infoP1.playAgain == -1)
-							{
-								infoP1.p1Plays = -1;
-								infoP1.playAgain = 0;
-								infoP1.serMess = "Player 1 quit";
-								callback.accept(infoP1);
-								infoP1 = null;
-								System.out.println("quit p1");
-							}
-							
-						}
-					
-						if(infoP1 != null && infoP2 != null)
-						{
-							
-							callback.accept(resultsInfo);
-							
-							updateClients(resultsInfo);
-							
-							infoP1 = null;
-							infoP2 = null;
-						}
+						WordInfo temp =(WordInfo) in.readObject();
+						temp.serverMessage = "client: " + count + ": " + temp.serverMessage;
+						callback.accept(temp);
+						execLogic(temp);
+				    	
 					}
 					//If someone Disconnects from the game
-					//Should be updated for the new game
 					catch(Exception e) 
 					{
-						
-						MorraInfo connLoss = new MorraInfo();
-						connLoss.serMess = "Client #"+count+" has left the server!";
-						numPlayers--;
-						connLoss.numPlayers = numPlayers;
-						callback.accept(connLoss);
-						updateClients(connLoss);
-						if(count == 1) {
-							playerOne = null;
-							System.out.println("disconnect p1");
-						}
-			
-						break;
+						WordInfo temp = new WordInfo();
+						temp.serverMessage = "OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!";
+						callback.accept(temp);
+				    	clients.remove(this);
+				    	break;
 					}
 				}
+			}
+			
+			//Check if right or wrong and and update curTurn in server
+			void handleGuess(WordInfo input) {
+			}
+			
+			
+			//pick a word from the category being sent, remove from bank
+			void pickWordFromBank(int cat) 
+			{
 				
 			}
+			
+			//sending word length
+			WordInfo prepareLength() {
+				WordInfo len = new WordInfo();
+				len.wordLength = curWord.length();
+				return len; 
+			}
+			
+			
+			
+			
+			//outer game logic function
+			void execLogic(WordInfo input) {
+				//client wants to play again
+				if(input.playAgain) {
+					
+				}
+				//client wants to quit
+				if(input.quit) {
+					
+				}
+				//client guessed a word
+				if(input.guess != ' ') {
+					handleGuess(input);
+					sendClientResponse(curTurn);
+				}
+				if(input.category != 0) {
+					pickWordFromBank(input.category); 
+					WordInfo lengthInfo = prepareLength();
+					sendClientResponse(lengthInfo);
+				}
+			}
+			
 		}
 
 }
