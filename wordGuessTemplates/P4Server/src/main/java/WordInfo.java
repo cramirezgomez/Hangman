@@ -8,10 +8,8 @@ public class WordInfo implements Serializable{
 	//Update the client
 	int wordLength;
 	Boolean isCorrect;
-	int guessesLeft;
 	String serverMessage;
 	ArrayList<Integer> positions;
-	int wordsWrong;
 	
 	
 	//Update the server 
@@ -23,10 +21,8 @@ public class WordInfo implements Serializable{
 	WordInfo(){
 		wordLength = 0;
 		isCorrect = false;
-		guessesLeft = 6;
 		serverMessage = " ";
 		positions = new ArrayList<Integer>();
-		wordsWrong = 0;
 		guess = ' ';
 		category = 0;
 		playAgain = false;

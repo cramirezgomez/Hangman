@@ -84,15 +84,46 @@ public Scene createStart(Stage primaryStage) {
 			IPAddress =enterIP.getText();
 			portNum = Integer.parseInt(enterPort.getText());
 			primaryStage.show();
-			
 			//Receive a message
 			clientConnection = new Client(data->
 			{
 				Platform.runLater(()->
 				{
-							WordInfo input = (WordInfo) data;
-							tempList.getItems().add(input.serverMessage);
+					//keep track of categories cleared and guesses on client
+					++clientConnection.serverResponses;
+					WordInfo input = (WordInfo) data;
+					tempList.getItems().add(input.serverMessage);
+					
+					//welcome message was sent
+					if(clientConnection.serverResponses == 1) 
+					{
+						
+					}
+					//length of the word is being sent
+					else if(input.wordLength != 0) {
+						
+					}
+					//guess response is being done
+					else
+					{
+						//our guesss was correct
+						if(input.isCorrect){
+							
+						}
+						//our guess was incorrect
+						else {
+							
+						}
+						
+						//ran out of guesses
+						if(clientConnection.guesses == 0) {
+							
+							//ran out of lives
+							if(clientConnection.lives == 0) {
 								
+							}
+						}
+					}			
 				});
 			}, IPAddress, portNum);
 			clientConnection.start();

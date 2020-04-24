@@ -2,6 +2,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class Client extends Thread{
@@ -11,6 +12,11 @@ public class Client extends Thread{
 	String IPAddress;
 	int portNumber;
 	String clientNum;
+	int guesses;
+	ArrayList<Boolean> catCleared;
+	int lives;
+	int serverResponses;
+	
 	
 	private Consumer<Serializable> callback;
 	
@@ -28,7 +34,32 @@ public class Client extends Thread{
 		callback = call;
 		this.IPAddress = ip;
 		this.portNumber = port;
+		this.guesses = 6;
+		this.catCleared = new ArrayList<Boolean>();
+		this.catCleared.add(false);
+		this.catCleared.add(false);
+		this.catCleared.add(false);
+		serverResponses = 0;
+		this.lives = 3;
 	}
+	
+	void resetVariables() {
+		this.catCleared.clear();
+		this.catCleared.add(false);
+		this.catCleared.add(false);
+		this.catCleared.add(false);
+		this.guesses = 6;
+		this.lives = 3;
+		
+		//might need this or not
+		serverResponses = 0;
+		
+	}
+	
+	void resetGuesses() {
+		this.guesses = 6;
+	}
+			
 	
 	public void run()
 	{
