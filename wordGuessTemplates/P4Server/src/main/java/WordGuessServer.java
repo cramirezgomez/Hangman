@@ -65,7 +65,7 @@ HashMap<String, Scene> sceneMap;
 //		later
 //      ||||||
 //      VVVVVV
-		portNumber.setText("5555");
+		portNumber.setText("5555"); //Used to avoid entering 5555 all the time 
 		//-------------//
 		
 		//---Server GUI--//
@@ -113,13 +113,14 @@ HashMap<String, Scene> sceneMap;
 							-> Should'nt be as much information as the last project
 						*/
 						
-						WordInfo input = (WordInfo) data;//<---
+						WordInfo input = (WordInfo) data;
 						listItems.getItems().add(input.serverMessage);
 						
-						//client guessed a word
+						//Display Client Guess
 						if(input.guess != ' ') {
 							listItems.getItems().add("Current Guess: " + input.guess);
 						}
+						//Display Client Category 
 						if(input.category != 0) {
 							listItems.getItems().add("Category picked: " + input.category);
 						}

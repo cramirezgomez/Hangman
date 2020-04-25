@@ -19,16 +19,20 @@ public class WordInfo implements Serializable{
 	Boolean quit;
 	
 	WordInfo(){
+		
 		wordLength = 0;
 		isCorrect = false;
 		serverMessage = " ";
+		
 		positions = new ArrayList<Integer>();
 		guess = ' ';
 		category = 0;
+		
 		playAgain = false;
 		quit = false;
 	}
 
+	//For Testing
 	WordInfo(int wordLength, Boolean isCorrect, String serverMessage, ArrayList<Integer> positions,
 			char guess, int category, Boolean playAgain, Boolean quit){
 		this.wordLength = wordLength;

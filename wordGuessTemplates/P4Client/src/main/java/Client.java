@@ -6,17 +6,20 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class Client extends Thread{
+	
 	Socket socketClient;
 	ObjectOutputStream out;
 	ObjectInputStream in;
+	
 	String IPAddress;
 	int portNumber;
+	
 	String clientNum;
 	int guesses;
+	
 	ArrayList<Boolean> catCleared;
 	int lives;
 	int serverResponses;
-	
 	
 	private Consumer<Serializable> callback;
 	
@@ -35,15 +38,18 @@ public class Client extends Thread{
 		this.IPAddress = ip;
 		this.portNumber = port;
 		this.guesses = 6;
+		
 		this.catCleared = new ArrayList<Boolean>();
 		this.catCleared.add(false);
 		this.catCleared.add(false);
 		this.catCleared.add(false);
+		
 		serverResponses = 0;
 		this.lives = 3;
 	}
 	
-	void resetVariables() {
+	void resetVariables() 
+	{
 		this.catCleared.clear();
 		this.catCleared.add(false);
 		this.catCleared.add(false);
@@ -53,10 +59,10 @@ public class Client extends Thread{
 		
 		//might need this or not
 		serverResponses = 0;
-		
 	}
 	
-	void resetGuesses() {
+	void resetGuesses() 
+	{
 		this.guesses = 6;
 	}
 			
