@@ -16,8 +16,6 @@ import javafx.stage.WindowEvent;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
-import javafx.geometry.Pos;
-import javafx.scene.layout.StackPane;
 
 public class WordGuessClient extends Application {
 	//Things needed for the GUI
@@ -120,72 +118,63 @@ public Scene titlePage() {
 
 	//Add these two nodes to the layout and return
 	layout.getChildren().addAll(title, startGameButton);
-	return layout;
+	//return layout;
+	return new Scene(layout, 600, 500);
 }
-	
+
+
 public Scene createStart() {
-		
+		/*Input ip address and port number
+	
+			________________________________
+			|                               |
+			|	IP Address					|
+			|	__________					|
+			|	__________		|Connect|	|
+			|								|
+			|	PortNumber					|
+			|   __________                  |
+			| 	__________  				|
+			|	      						|
+			|								|
+			|								|
+			|								|
+			________________________________
+		*/
+	
+		//Widgets for screen
 		Label labIP = new Label("IP Address");
 		Label labPort = new Label("Port Number");
-		
 		TextField enterIP = new TextField();
 		TextField enterPort = new TextField();
-		enterIP.setText("127.0.0.1");
-		enterPort.setText("5555");
 		Button btnConnect = new Button("Connect");
 		
+		//set default values in box for faster testing
+		enterIP.setText("127.0.0.1");
+		enterPort.setText("5555");
+		
+		//create boxes to format things
 		VBox col1 = new VBox(labIP, enterIP, labPort, enterPort);
 		VBox col2 = new VBox(btnConnect);
 		HBox clientBox = new HBox(col1, col2);
-		//clientBox.setStyle("-fx-background-color: blue");
 		
+		//Connect button event handler
 		btnConnect.setOnAction(e->{
+			//change scenes
 			window.setScene(sceneMap.get("game"));
 			
+			//get our input for client
 			IPAddress = enterIP.getText();
 			portNum = Integer.parseInt(enterPort.getText());
-			
 			window.show();
-			//Receive a message
+			
+			//Received a message from the server
 			clientConnection = new Client(data->
 			{
 				Platform.runLater(()->
 				{
-					//keep track of categories cleared and guesses on client
-					++clientConnection.serverResponses;
-					WordInfo input = (WordInfo) data;
-					tempList.getItems().add(input.serverMessage);
-					
-					//welcome message was sent
-					if(clientConnection.serverResponses == 1) 
-					{
-						
-					}
-					//length of the word is being sent
-					else if(input.wordLength != 0) {
-						
-					}
-					//guess response is being done
-					else
-					{
-						//our guesss was correct
-						if(input.isCorrect){
-							
-						}
-						//our guess was incorrect
-						else {
-							
-						}
-						
-						//ran out of guesses
-						if(clientConnection.guesses == 0) {
-							
-							//ran out of lives
-							if(clientConnection.lives == 0) {
+					gameLogic((WordInfo) data);
 								
-							}
-						}
-					}			
 				});
 			}, IPAddress, portNum);
 			clientConnection.start();
@@ -195,18 +184,21 @@ public Scene createStart() {
 		
 	}
 
+	//temporary scene for testing the server
 	public Scene createGame() {
 		
+		//Widgets
 		TextField tempTxt = new TextField();
 		Button sendGuess = new Button("Send Guess");
 		Button sendCat = new Button("Send Cat");
-		
 		tempList = new ListView<String>();
 		VBox clientBox = new VBox(10, tempList, tempTxt, sendGuess, sendCat );
 		 
+		//button for sending a letter
 		sendGuess.setOnAction(e->
 		{
 			if(tempTxt.getText().length() == 1) {
+				//create a new object with the guess and send
 				WordInfo curGuess = guessRequest(tempTxt.getText().charAt(0));
 				clientConnection.send(curGuess); 
 				tempTxt.clear();
@@ -219,10 +211,12 @@ public Scene createStart() {
 			
 		});
 		
+		//button for sending a category
 		sendCat.setOnAction(e->
 		{
 			int x = Integer.parseInt(tempTxt.getText());
 			if( x >= 1 && x <= 3) {
+				//create a new object with category and send
 				WordInfo curCategory = categoryRequest(x);
 				clientConnection.send(curCategory); 
 				tempTxt.clear();
@@ -269,5 +263,44 @@ public Scene createStart() {
 		tempObj.quit = true;
 		tempObj.serverMessage = "clicked quit";
 		return tempObj;
+	}
+	
+	//Function called inside Platform Runlater
+	void gameLogic(WordInfo input) {
+		//keep track of categories cleared and guesses on client
+		++clientConnection.serverResponses;
+		System.out.println("num of server responses: " + clientConnection.serverResponses);
+		tempList.getItems().add(input.serverMessage);
+		
+		//welcome message was sent
+		if(clientConnection.serverResponses == 1) 
+		{
+			
+		}
+		//length of the word is being sent
+		else if(input.wordLength != 0) {
+			
+		}
+		//guess response is being done
+		else
+		{
+			//our guesss was correct
+			if(input.isCorrect){
+				
+			}
+			//our guess was incorrect
+			else {
+				
+			}
+			
+			//ran out of guesses
+			if(clientConnection.guesses == 0) {
+				
+				//ran out of lives
+				if(clientConnection.lives == 0) {
+					
+				}
+			}
+		}
 	}
 }

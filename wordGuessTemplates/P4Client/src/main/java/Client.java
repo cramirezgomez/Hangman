@@ -102,6 +102,7 @@ public class Client extends Thread{
 		}
 	}
 	
+	//close connection and stream
 	public void disconnect()
 	{
 		try 
