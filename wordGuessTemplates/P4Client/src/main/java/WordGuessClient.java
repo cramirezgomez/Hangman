@@ -120,7 +120,8 @@ public Scene titlePage() {
 
 	//Add these two nodes to the layout and return
 	layout.getChildren().addAll(title, startGameButton);
-	return layout;
+	Scene scene = new Scene(layout, WIDTH, HEIGHT);
+	return scene;
 }
 	
 public Scene createStart() {
