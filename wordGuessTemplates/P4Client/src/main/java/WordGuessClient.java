@@ -144,12 +144,8 @@ public Scene createStart() {
 			
 			IPAddress = enterIP.getText();
 			portNum = Integer.parseInt(enterPort.getText());
-<<<<<<< HEAD
-			window.show();
 			
-=======
-			primaryStage.show();
->>>>>>> b838c472a4c9af98bd71cffd071f633a90462515
+			window.show();
 			//Receive a message
 			clientConnection = new Client(data->
 			{
