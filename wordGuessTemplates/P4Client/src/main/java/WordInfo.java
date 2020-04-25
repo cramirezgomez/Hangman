@@ -32,6 +32,22 @@ public class WordInfo implements Serializable{
 		playAgain = false;
 		quit = false;
 	}
+
+	WordInfo(int wordLength, Boolean isCorrect, int guessesLeft, String serverMessage, ArrayList<Integer> positions, int wordsWrong,
+			char guess, int category, Boolean playAgain, Boolean quit){
+		this.wordLength = wordLength;
+		this.isCorrect = isCorrect;
+		this.guessesLeft = guessesLeft;
+		this.serverMessage = serverMessage;
+		this.positions = positions;
+		this.wordsWrong = wordsWrong;
+
+		this.guess = guess;
+		this.category = category;
+		this.playAgain = playAgain;
+		this.quit = quit;
+
+	}
 	
 	
 	

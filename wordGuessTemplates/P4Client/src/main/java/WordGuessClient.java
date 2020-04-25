@@ -13,33 +13,55 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+import javafx.geometry.Pos;
+import javafx.scene.layout.StackPane;
+
 public class WordGuessClient extends Application {
+	//Things needed for the GUI
+	protected Stage window;
+	protected HashMap<String, Scene> sceneMap;
+	public final int WIDTH = 600;
+	public final int HEIGHT = 500;
+	public final Font TITLE_FONT = new Font("Gil Sans", 50);
+	public final Font NARRATION_FONT = new Font("Gil Sans", 20);
+	public final Font SMALLER_FONT = new Font("Gil Sans", 15);
+
+
+	//Things needed for the Client-Server connection
 	Client clientConnection;
 	ListView<String> tempList;
 	int portNum;
 	String IPAddress;
-	HashMap<String, Scene> sceneMap;
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		launch(args);
 	}
 
-	//feel free to remove the starter code from this method
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		// TODO Auto-generated method stub
-		primaryStage.setTitle("(Client) Word Guess!!!");
+		/*Set the window to the primaryStage.
+		 This is to ensure that we can call the window 
+		 whenever we need to for other functions. 
+		*/
+		window = primaryStage;
+		window.setTitle("(Client) Word Guess!!!");
+		
+		/*We create the scenes and put them here. 
+		As the number of scenes grow we may need to move this
+		 into a method to keep the clutter to a minimum
+		*/
 		sceneMap = new HashMap<String, Scene>();
+		sceneMap.put("title", titlePage());
+		sceneMap.put("start",  createStart());
+		sceneMap.put("game",  createGame());
 		
+		window.setScene(sceneMap.get("title"));
+		window.show();
 		
-		sceneMap.put("start",  createStart(primaryStage));
-		sceneMap.put("game",  createGame(primaryStage));
-		
-		primaryStage.setScene(sceneMap.get("start"));
-		primaryStage.show();
-		
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+		window.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
             	try {
@@ -53,16 +75,55 @@ public class WordGuessClient extends Application {
                 Platform.exit();
                 System.exit(0);
             }
-        });
-		
-	
-		
-		
-		
+		});
 		
 	}
+
+
+public Scene titlePage() {
+	/*This will just be the start page, so for now, 
+	it will just have the title and the button to 
+	start the game. May add further things like 
+	background image and fade ins later
+			________________________________
+			|                               |
+			| 	  Welcome to Word Guess!	|
+			|								|
+			|								|
+			|								|
+			|								|
+			|                               |
+			| 								|
+			|	      |Start Game|			|
+			|								|
+			|								|
+			|								|
+			________________________________
+	*/
+
+	VBox layout = new VBox();
+	layout.setSpacing(200);
 	
-public Scene createStart(Stage primaryStage) {
+	//This will be for the title
+	Text title = new Text("Welcome to Word Guess!");
+	title.setFont(TITLE_FONT);
+	title.setWrappingWidth(300);
+	title.setTextAlignment(TextAlignment.CENTER);
+
+	//This will be for the button
+	Button startGameButton = new Button("Start Game");
+	startGameButton.setOnAction(e -> {
+		//set the scene to createStart()
+		window.setScene(sceneMap.get("start"));
+		window.show();
+	});
+
+	//Add these two nodes to the layout and return
+	layout.getChildren().addAll(title, startGameButton);
+	return layout;
+}
+	
+public Scene createStart() {
 		
 		Label labIP = new Label("IP Address");
 		Label labPort = new Label("Port Number");
@@ -79,20 +140,56 @@ public Scene createStart(Stage primaryStage) {
 		//clientBox.setStyle("-fx-background-color: blue");
 		
 		btnConnect.setOnAction(e->{
-			primaryStage.setScene(sceneMap.get("game"));
+			window.setScene(sceneMap.get("game"));
 			
-			IPAddress =enterIP.getText();
+			IPAddress = enterIP.getText();
 			portNum = Integer.parseInt(enterPort.getText());
-			primaryStage.show();
+<<<<<<< HEAD
+			window.show();
 			
+=======
+			primaryStage.show();
+>>>>>>> b838c472a4c9af98bd71cffd071f633a90462515
 			//Receive a message
 			clientConnection = new Client(data->
 			{
 				Platform.runLater(()->
 				{
-							WordInfo input = (WordInfo) data;
-							tempList.getItems().add(input.serverMessage);
+					//keep track of categories cleared and guesses on client
+					++clientConnection.serverResponses;
+					WordInfo input = (WordInfo) data;
+					tempList.getItems().add(input.serverMessage);
+					
+					//welcome message was sent
+					if(clientConnection.serverResponses == 1) 
+					{
+						
+					}
+					//length of the word is being sent
+					else if(input.wordLength != 0) {
+						
+					}
+					//guess response is being done
+					else
+					{
+						//our guesss was correct
+						if(input.isCorrect){
+							
+						}
+						//our guess was incorrect
+						else {
+							
+						}
+						
+						//ran out of guesses
+						if(clientConnection.guesses == 0) {
+							
+							//ran out of lives
+							if(clientConnection.lives == 0) {
 								
+							}
+						}
+					}			
 				});
 			}, IPAddress, portNum);
 			clientConnection.start();
@@ -102,7 +199,7 @@ public Scene createStart(Stage primaryStage) {
 		
 	}
 
-	public Scene createGame(Stage primaryStage) {
+	public Scene createGame() {
 		
 		TextField tempTxt = new TextField();
 		Button sendGuess = new Button("Send Guess");
