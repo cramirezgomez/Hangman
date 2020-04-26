@@ -58,7 +58,7 @@ public class Client extends Thread{
 		this.lives = 3;
 		
 		//might need this or not
-		serverResponses = 0;
+		//serverResponses = 0;
 	}
 	
 	void resetGuesses() 

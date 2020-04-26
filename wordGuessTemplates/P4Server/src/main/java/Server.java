@@ -101,7 +101,6 @@ public class Server {
 			ArrayList<String> wordBank3;
 			
 			String curWord; //Current Word being guessed 
-			WordInfo curTurn; //Game Information sent to client 
 			
 			//Default constructor 
 			ClientThread(Socket s, int count)
@@ -142,7 +141,6 @@ public class Server {
 				Collections.shuffle(wordBank3); 
 				
 				curWord = " "; //Clear Word 
-				curTurn = new WordInfo(); //Create new client information
 			}
 			
 			//update one client
@@ -216,18 +214,21 @@ public class Server {
 			}
 			
 			//Check if right or wrong and and update curTurn in server
-			void handleGuess(WordInfo input) 
+			WordInfo handleGuess(WordInfo input) 
 			{
+				WordInfo results = new WordInfo();
 				//Find the letters in the word that the user guessed
 				//Store the index positions of that guess in the array 
 				for(int i = 0; i < curWord.length(); i++)
 				{
+					
 					if(curWord.charAt(i) == input.guess)
 					{
-						curTurn.positions.add(i + 1);
-						input.isCorrect = true;
+						results.positions.add(i + 1);
+						results.isCorrect = true;
 					}
 				}
+				return results;
 			}
 			
 			//pick a word from the category being sent, remove from bank
@@ -284,18 +285,15 @@ public class Server {
 					catch(Exception e){}
 					
 				}
-				//client guessed a word
+				//client guessed a char
 				if(input.guess != ' ') 
 				{
-					handleGuess(input);
-					sendClientResponse(curTurn);
+					sendClientResponse(handleGuess(input));
 				}
 				if(input.category != 0) 
 				{
 					pickWordFromBank(input.category); 
 					WordInfo lengthInfo = prepareLength();
-					
-					
 					sendClientResponse(lengthInfo);
 				}
 			}
