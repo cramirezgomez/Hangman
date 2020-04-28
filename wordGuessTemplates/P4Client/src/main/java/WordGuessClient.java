@@ -3,11 +3,13 @@ import java.util.HashMap;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -320,7 +322,7 @@ public Scene listenForServer(){
 	layout.setAlignment(Pos.CENTER);
 
 	//Add layout to the scene and return
-	Scene scene(layout, WIDHT, HEIGHT);
+	Scene scene = new Scene(layout, WIDTH, HEIGHT);
 	return scene;
 }
 
