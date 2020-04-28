@@ -23,6 +23,21 @@ public class Client extends Thread{
 	
 	private Consumer<Serializable> callback;
 	
+	//Added this constructor so that our methods that use the Client
+	//aren't null before the player starts the game.
+	Client(){
+		this.guesses = 6;
+		
+		this.catCleared = new ArrayList<Boolean>();
+		this.catCleared.add(false);
+		this.catCleared.add(false);
+		this.catCleared.add(false);
+		
+		serverResponses = 0;
+		this.lives = 3;
+		
+	}
+	
 	//default contructor with values used in class
 	Client(Consumer<Serializable> call)
 	{
