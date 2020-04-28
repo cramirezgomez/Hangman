@@ -54,6 +54,8 @@ public class WordGuessClient extends Application {
 		sceneMap = new HashMap<String, Scene>();
 		sceneMap.put("title", titlePage());
 		sceneMap.put("start",  createStart());
+		sceneMap.put("select category", selectCategory());
+		sceneMap.put("listen", listenForServer());
 		sceneMap.put("game",  createGame());
 		
 		window.setScene(sceneMap.get("title"));
@@ -161,7 +163,8 @@ public Scene createStart() {
 		//Connect button event handler
 		btnConnect.setOnAction(e->{
 			//change scenes
-			window.setScene(sceneMap.get("game"));
+			//window.setScene(sceneMap.get("game"));
+			window.setScene(sceneMap.get("select category"));
 			
 			//get our input for client
 			IPAddress = enterIP.getText();
@@ -183,6 +186,143 @@ public Scene createStart() {
 		return new Scene(clientBox, 600, 500);
 		
 	}
+
+public Scene selectCategory(){
+	/*This will be the scene that lets the client
+	pick the specific category that they want
+			________________________________
+			|                       Lives: 3|
+			| 	                 			|
+			|								|
+			|		Select a Category		|
+			|								|
+			|								|
+			|    |Fruit| |Color| |Animal|   |
+			| 								|
+			|	                			|
+			|								|
+			|								|
+			|								|
+			 ________________________________
+	*/
+	
+	//BorderPane will have the top display the Lives and the 
+	//center display the narration and buttons
+	BorderPane layout = new BorderPane();
+
+	//this text is for the lives
+	Text livesText = new Text("Lives: " + clientConnection.lives);
+	livesText.setFont(SMALLER_FONT);
+	livesText.setTextAlignment(TextAlignment.CENTER);
+
+	//This VBox will hold the narration and buttons and put them in the 
+	//center
+	VBox centerLayout = new VBox();
+	centerLayout.setSpacing(200);
+
+	//this text is for the narration
+	Text selectCategoryText = new Text("Select Category");
+	selectCategoryText.setFont(NARRATION_FONT);
+
+	//This HBox is for the buttons
+	HBox buttonLayout = new HBox();
+	buttonLayout.setSpacing(15);
+
+	//Create the buttons for the categories
+	Button fruitBtn = new Button("Fruit");
+	Button colorBtn = new Button("Color");
+	Button animalBtn = new Button("Animal");
+
+	//Create event handlers for when the player picks a category
+	//(selectCategory(int category) is a helper function)
+	fruitBtn.setOnAction(e -> {
+		selectCategory(1);
+	});
+
+	colorBtn.setOnAction(e -> {
+		selectCategory(2);
+	});
+
+	animalBtn.setOnAction(e -> {
+		selectCategory(3);
+	});
+
+	//Add the buttons in the HBox
+	buttonLayout.getChildren().addAll(fruitBtn, colorBtn, animalBtn);
+	buttonLayout.setAlignment(Pos.CENTER);
+
+	//Add the narration and buttonLayout in the VBox
+	centerLayout.getChildren().addAll(selectCategoryText, buttonLayout);
+
+	//Add the text and other information in their respected positions
+	layout.setTop(livesText);
+	layout.setCenter(centerLayout);
+
+	//create scene and return
+	Scene scene = new Scene(layout, WIDTH, HEIGHT);
+	return scene;
+}
+public void selectCategory(int category){
+	//This is a helper function used to send a category to the client
+
+	WordInfo wordInfo = categoryRequest(category);
+	clientConnection.send(wordInfo);
+
+	window.setScene(sceneMap.get("listen"));
+	window.show();
+
+}
+
+public Scene listenForServer(){
+	/*This scene will display until the server has
+	sent the WordInfo back to the client for the game
+			________________________________
+			|                               |
+			| 	                 			|
+			|								|
+			|		                    	|
+			|								|
+			|	   Waiting on Server...		|
+			|    						    |
+			| 								|
+			|	                			|
+			|								|
+			|								|
+			|								|
+			 ________________________________
+	*/
+
+	//VBox that will handle the text (and possibly any animation that I want to include)
+	VBox layout = new VBox();
+	layout.setSpacing(20);
+	
+	//This text lets the user know that we are waiting on server
+	Text waitingOnServerText = new Text("Waiting on Server");
+	waitingOnServerText.setFont(NARRATION_FONT);
+	waitingOnServerText.setWrappingWidth(300);
+	waitingOnServerText.setTextAlignment(TextAlignment.CENTER);
+
+	/*TODO: Create something that gets the WordInfo from the client
+	and moves to the next scene. For example:
+	
+	while(true){
+		if(clientConnection.readObject() != null){
+			//This means client has recieved the object
+			window.setScene(sceneMap.get("guess a letter"));
+			window.show();
+		}
+	}
+	
+	*/
+
+	//Add text to the layout
+	layout.getChildren().addAll(waitingOnServerText);
+	layout.setAlignment(Pos.CENTER);
+
+	//Add layout to the scene and return
+	Scene scene(layout, WIDHT, HEIGHT);
+	return scene;
+}
 
 	//temporary scene for testing the server
 	public Scene createGame() {
