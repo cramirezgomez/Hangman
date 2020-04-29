@@ -16,12 +16,18 @@ public class Client extends Thread{
 	
 	String clientNum;
 	int guesses;
+	int lettersLeft;
+	public int curCat;
+	public String curWord;
 	
 	ArrayList<Boolean> catCleared;
-	int lives;
+	ArrayList<Integer> catLives;
+	
 	int serverResponses;
 	
 	private Consumer<Serializable> callback;
+	
+	
 	
 	//Added this constructor so that our methods that use the Client
 	//aren't null before the player starts the game.
@@ -33,8 +39,18 @@ public class Client extends Thread{
 		this.catCleared.add(false);
 		this.catCleared.add(false);
 		
-		serverResponses = 0;
-		this.lives = 3;
+		this.catLives = new ArrayList<Integer>();
+		this.catLives.add(3);
+		this.catLives.add(3);
+		this.catLives.add(3);
+		
+		
+		
+		this.serverResponses = 0;
+		
+		this.lettersLeft = 0;
+		this.curCat = 0;
+		this.curWord = "_";
 		
 	}
 	
@@ -60,7 +76,11 @@ public class Client extends Thread{
 		this.catCleared.add(false);
 		
 		serverResponses = 0;
-		this.lives = 3;
+		
+		this.catLives = new ArrayList<Integer>();
+		this.catLives.add(3);
+		this.catLives.add(3);
+		this.catLives.add(3);
 	}
 	
 	void resetVariables() 
@@ -70,7 +90,11 @@ public class Client extends Thread{
 		this.catCleared.add(false);
 		this.catCleared.add(false);
 		this.guesses = 6;
-		this.lives = 3;
+		
+		this.catLives.clear();
+		this.catLives.add(3);
+		this.catLives.add(3);
+		this.catLives.add(3);
 		
 		//might need this or not
 		//serverResponses = 0;

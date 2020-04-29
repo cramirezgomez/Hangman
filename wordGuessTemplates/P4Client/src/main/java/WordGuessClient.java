@@ -34,6 +34,21 @@ public class WordGuessClient extends Application {
 	public final Font SMALLER_FONT = new Font("Gil Sans", 15);
 	
 	public final String HANGMAN_ICON = "https://www.pngkey.com/png/full/345-3454952_risco-de-suicdio-icon-hangmans-knot.png";
+	//Widgets needed in other functions
+	Text wordText ;
+	Button fruitBtn;
+	Button colorBtn;
+	Button animalBtn;
+	HashMap<Button, Double> buttonMap;
+	Text narrationText;
+	
+	Text livesText1Cat;
+	Text livesText2Cat;
+	Text livesText3Cat;
+	
+	Text livesText1Guess;
+	Text livesText2Guess;
+	Text livesText3Guess;
 
 
 	//Things needed for the Client-Server connection
@@ -234,11 +249,18 @@ public class WordGuessClient extends Application {
 		VBox topLayout = new VBox();
 		
 		//this text is for the lives
-		Text livesText = new Text("Lives: " + clientConnection.lives);
-		livesText.setFont(SMALLER_FONT);
+		livesText1Cat = new Text("Fruit Lives: " + clientConnection.catLives.get(0));
+		livesText2Cat = new Text("Color Lives: " + clientConnection.catLives.get(1));
+		livesText3Cat = new Text("Animal Lives: " + clientConnection.catLives.get(2));
+		livesText1Cat.setFont(SMALLER_FONT);
+		livesText2Cat.setFont(SMALLER_FONT);
+		livesText3Cat.setFont(SMALLER_FONT);
 		
 		//Add the text to the topLayout
-		topLayout.getChildren().add(livesText);
+		topLayout.getChildren().add(livesText1Cat);
+		topLayout.getChildren().add(livesText2Cat);
+		topLayout.getChildren().add(livesText3Cat);
+		
 		topLayout.setAlignment(Pos.TOP_RIGHT);
 		
 		//This VBox will hold the narration and buttons and put them in the 
@@ -255,21 +277,24 @@ public class WordGuessClient extends Application {
 		buttonLayout.setSpacing(15);
 	
 		//Create the buttons for the categories
-		Button fruitBtn = new Button("Fruit");
-		Button colorBtn = new Button("Color");
-		Button animalBtn = new Button("Animal");
+		fruitBtn = new Button("Fruit");
+		colorBtn = new Button("Color");
+		animalBtn = new Button("Animal");
 	
 		//Create event handlers for when the player picks a category
 		//(selectCategory(int category) is a helper function)
 		fruitBtn.setOnAction(e -> {
+			clientConnection.curCat = 1;
 			selectCategory(1);
 		});
 	
 		colorBtn.setOnAction(e -> {
+			clientConnection.curCat = 2;
 			selectCategory(2);
 		});
 	
 		animalBtn.setOnAction(e -> {
+			clientConnection.curCat = 3;
 			selectCategory(3);
 		});
 	
@@ -299,8 +324,8 @@ public class WordGuessClient extends Application {
 		see which node/layout belongs to which node/layout.
 			________________________________
 			|                       Lives: 3|
-			| 	                 			|
-			|								|
+			| 	                 	Lives: 3|
+			|						Lives: 3|
 			|		 Guess a Letter			|
 			|		You have _ guesses.		|
 			|								|
@@ -318,9 +343,15 @@ public class WordGuessClient extends Application {
 			//This VBox will hold the information regarding the player's life
 			//and put them in the top
 			VBox topLayout = new VBox();
-				Text livesText = new Text("Lives: " + clientConnection.lives);
-				livesText.setFont(SMALLER_FONT);
-			topLayout.getChildren().add(livesText);
+				livesText1Guess = new Text("Fruit Lives: " + clientConnection.catLives.get(0));
+				livesText2Guess = new Text("Color Lives: " + clientConnection.catLives.get(1));
+				livesText3Guess = new Text("Animal Lives: " + clientConnection.catLives.get(2));
+				livesText1Guess.setFont(SMALLER_FONT);
+				livesText2Guess.setFont(SMALLER_FONT);
+				livesText3Guess.setFont(SMALLER_FONT);
+			topLayout.getChildren().add(livesText1Guess);
+			topLayout.getChildren().add(livesText2Guess);
+			topLayout.getChildren().add(livesText3Guess);
 			topLayout.setAlignment(Pos.TOP_RIGHT);
 			
 			//Create the centerLayout. This will tell the user the information to
@@ -328,13 +359,13 @@ public class WordGuessClient extends Application {
 			VBox centerLayout = new VBox();
 			centerLayout.setSpacing(100);
 				int guesses = clientConnection.guesses;
-				Text narrationText = new Text("Guess a letter. You have " + guesses + " guesses left.");
+				narrationText = new Text("Guess a letter. You have " + guesses + " guesses left.");
 				narrationText.setFont(NARRATION_FONT);
 				narrationText.setWrappingWidth(300);
 				narrationText.setTextAlignment(TextAlignment.CENTER);
 				//TODO: Find out how to get the word from the server
-				String word = "______________";	//This will change when we get the word
-				Text wordText = new Text(word);
+				String word = clientConnection.curWord;	//This will change when we get the word
+				wordText = new Text(word);
 				wordText.setFont(NARRATION_FONT);
 				wordText.setWrappingWidth(300);
 				wordText.setTextAlignment(TextAlignment.CENTER);
@@ -346,11 +377,24 @@ public class WordGuessClient extends Application {
 					Button confirmButton = new Button("Confirm");
 					confirmButton.setDisable(true);
 					confirmButton.setOnAction(e -> {
-						//TODO: send an updated WordInfo to the server.
+						confirmButton.setDisable(true);
+						//sends an updated WordInfo to the server.
 						//	makeGuess(wordInfo.guess);
+						clientConnection.send(wordInfo); 
+						//search for the correct button to disable
+						buttonMap.forEach((button, value) -> {
+							if(button.getText().toLowerCase().charAt(0) == wordInfo.guess) {
+								button.setDisable(true);
+							}
+						});
+						
 						//TODO: put a transparent waiting background on top
 						//	of the layout until the server spits back an updated
 						//	WordInfo object.
+						
+							
+						
+						
 					});
 					//Create VBox that will house the rows
 					VBox alphabetButtonLayout = new VBox();
@@ -366,33 +410,45 @@ public class WordGuessClient extends Application {
 						row2.setAlignment(Pos.CENTER);
 						row3.setAlignment(Pos.CENTER);
 							//Create the map with all the buttons
-							HashMap<Button, Double> buttonMap = makeAlphabetMap();
+							buttonMap = makeAlphabetMap();
 							ArrayList<Button> row1Button = makeButtonList(buttonMap, 1.0, 2.0);
 							ArrayList<Button> row2Button = makeButtonList(buttonMap, 2.0, 3.0);
 							ArrayList<Button> row3Button = makeButtonList(buttonMap, 3.0, 4.0);
 							//Assign each button to one of three rows (much like a keyboard)
 							//and have each button perform the same action event
 							for(Button b : row1Button) {
-								b.setOnAction(e -> {
+								/*b.setOnAction(e -> {
 									confirmButton.setDisable(false);
 									//TODO: Update WordInfo
-								});
+								});*/
 								row1.getChildren().add(b);
 							}
 							for(Button b : row2Button) {
-								b.setOnAction(e -> {
+								/*b.setOnAction(e -> {
 									confirmButton.setDisable(false);
 									//TODO: Update WordInfo
-								});
+								});*/
 								row2.getChildren().add(b);
 							}
 							for(Button b : row3Button) {
-								b.setOnAction(e -> {
+								/*b.setOnAction(e -> {
 									confirmButton.setDisable(false);
 									//TODO: Update WordInfo
-								});
+								});*/
 								row3.getChildren().add(b);
 							}
+							//setup event handlers for all the buttons
+							buttonMap.forEach((button, value) -> {
+								button.setOnAction(e->
+								{
+									confirmButton.setDisable(false);
+									wordInfo = guessRequest(button.getText().toLowerCase().charAt(0));
+									//button.setDisable(true);
+									//clientConnection.send(curGuess); 
+								});
+							});
+							
+							
 					alphabetButtonLayout.getChildren().addAll(row1, row2, row3);
 					alphabetButtonLayout.setAlignment(Pos.CENTER);
 				userInputLayout.getChildren().addAll(alphabetButtonLayout, confirmButton);
@@ -465,30 +521,118 @@ public class WordGuessClient extends Application {
 		//welcome message was sent
 		if(clientConnection.serverResponses == 1) 
 		{
-			
+			System.out.println("Recieved: welcome message");
 		}
 		//length of the word is being sent
 		else if(input.wordLength != 0) {
-			
+			System.out.println("Recieved: length of word is " + input.wordLength);
+			clientConnection.lettersLeft = input.wordLength;
+			clientConnection.curWord = "";
+			for(int i = 0; i <input.wordLength; ++i) {
+				clientConnection.curWord = clientConnection.curWord + '*';
+			}
+			wordText.setText(clientConnection.curWord);
 		}
 		//guess response is being done
 		else
 		{
 			//our guesss was correct
 			if(input.isCorrect){
+				System.out.println("Recieved: guess was correct");
+				clientConnection.lettersLeft = clientConnection.lettersLeft - input.positions.size();
+				input.positions.forEach(e -> {
+					clientConnection.curWord = clientConnection.curWord.substring(0, e) + wordInfo.guess +
+											   clientConnection.curWord.substring(e + 1);
+				});
+				//word was guessed
+				if(clientConnection.lettersLeft == 0) {
+					System.out.println("Recieved: word was guessed");
+					switch(clientConnection.curCat)
+					{
+						case 1: 
+							System.out.println("1");
+							fruitBtn.setDisable(true);
+							break;
+						case 2:
+							System.out.println("2");
+							colorBtn.setDisable(true);
+							break;
+						case 3:
+							System.out.println("3");
+							animalBtn.setDisable(true);
+							break;
+						default:
+							
+							System.out.println("error");
+							//error
+							break;
+					}
+					
+//TO DO: screen with play again and quit
+					
+					enableKeyboard();
+					clientConnection.resetGuesses();
+					//game is won
+					if(colorBtn.isDisabled() && fruitBtn.isDisabled() && animalBtn.isDisabled())
+					{
+						System.out.println("game was cleared");
+						enableCategories();
+					}
+					//cat is won
+					else {
+						System.out.println("cat cleared");
+						
+						window.setScene(sceneMap.get("select category"));
+						window.show();
+						
+					}
+					
+				}
+				//update current word
+				wordText.setText(clientConnection.curWord);
+				
 				
 			}
 			//our guess was incorrect
 			else {
-				
+				--clientConnection.guesses;
+				narrationText.setText("Guess a letter. You have " + clientConnection.guesses + " guesses left.");
+				System.out.println("Recieved: guess was wrong");
 			}
 			
 			//ran out of guesses
 			if(clientConnection.guesses == 0) {
+				int pos = clientConnection.curCat - 1;
+				int val= clientConnection.catLives.get(pos) - 1;
+				clientConnection.catLives.set(pos, val);
+
 				
+				
+				livesText1Cat.setText("Fruit Lives: " + clientConnection.catLives.get(0));
+				livesText2Cat.setText("Color Lives: " + clientConnection.catLives.get(1));
+				livesText3Cat.setText("Animal Lives: " + clientConnection.catLives.get(2));
+				livesText1Guess.setText("Fruit Lives: " + clientConnection.catLives.get(0));
+				livesText2Guess.setText("Color Lives: " + clientConnection.catLives.get(1));
+				livesText3Guess.setText("Animal Lives: " + clientConnection.catLives.get(2));
+				
+				enableKeyboard();
+			   	clientConnection.resetGuesses();
+			   	
 				//ran out of lives
-				if(clientConnection.lives == 0) {
+				if(clientConnection.catLives.get(0) == 0 || 
+				   clientConnection.catLives.get(1) == 0 || 
+				   clientConnection.catLives.get(2) == 0) 
+				{
+				   System.out.println("Also Recieved: ran out of lives");
+//TO DO: screen with play again and quit
+					enableCategories();
 					
+				}
+				else 
+				{
+					System.out.println("Also Recieved: ran out of guesses");
+					window.setScene(sceneMap.get("select category"));
+					window.show();
 				}
 			}
 		}
@@ -598,6 +742,7 @@ public class WordGuessClient extends Application {
 		alphabetMap.put(new Button("N"), 3.5);
 		alphabetMap.put(new Button("M"), 3.6);
 		
+		
 		return alphabetMap;
 	}
 	public ArrayList<Button> makeButtonList(HashMap <Button, Double> map, double floor, double ceiling){
@@ -675,6 +820,17 @@ public class WordGuessClient extends Application {
 		tempObj.quit = true;
 		tempObj.serverMessage = "clicked quit";
 		return tempObj;
+	}
+	
+	void enableKeyboard() {
+		buttonMap.forEach((button, value) -> {
+				button.setDisable(false);
+		});
+	}
+	void enableCategories() {
+		fruitBtn.setDisable(false);
+		animalBtn.setDisable(false);
+		colorBtn.setDisable(false);
 	}
 		
 }
