@@ -13,7 +13,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -33,6 +32,7 @@ public class WordGuessClient extends Application {
 	public final Font TITLE_FONT = new Font("Gil Sans", 50);
 	public final Font NARRATION_FONT = new Font("Gil Sans", 20);
 	public final Font SMALLER_FONT = new Font("Gil Sans", 15);
+	
 
 
 	//Things needed for the Client-Server connection
@@ -40,6 +40,9 @@ public class WordGuessClient extends Application {
 	ListView<String> tempList;
 	int portNum;
 	String IPAddress;
+	
+	//WordInfo that will be sent to the server and back
+	public WordInfo wordInfo = new WordInfo();
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -285,74 +288,6 @@ public class WordGuessClient extends Application {
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		return scene;
 	}
-	public void selectCategory(int category){
-		//This is a helper function used to send a category to the client
-	
-		WordInfo wordInfo = categoryRequest(category);
-		clientConnection.send(wordInfo);
-	
-		window.setScene(sceneMap.get("guess letter"));
-		window.show();
-	
-	}
-	
-	public VBox makeLoadingScreen() {
-		//This will just be a loading layout that will appear when the user
-		//makes a selection
-		
-		VBox layout = new VBox();
-		layout.setOpacity(0.20);
-		layout.setStyle("-fx-background-color: white");
-		layout.setSpacing(100);
-		
-		Text loadingText = new Text("Loading");
-		loadingText.setFont(NARRATION_FONT);
-		
-		//Create animation to show that you are waiting... I guess.
-		//	This will be housed in a HBox
-		HBox animationLayout = new HBox();
-		animationLayout.setSpacing(20);
-		
-		Circle c1 = new Circle();
-		Circle c2 = new Circle();
-		Circle c3 = new Circle();
-		c1.setRadius(10);
-		c1.setFill(Color.BLACK);
-		c2.setRadius(10);
-		c2.setFill(Color.BLACK);
-		c3.setRadius(10);
-		c3.setFill(Color.BLACK);
-		
-		animationLayout.getChildren().addAll(c1, c2, c3);
-		animationLayout.setAlignment(Pos.CENTER);
-		
-		layout.getChildren().addAll(loadingText, animationLayout);
-		layout.setAlignment(Pos.CENTER);
-		
-		TranslateTransition t1 = new TranslateTransition();
-		t1.setDuration(Duration.seconds(1.5));
-		t1.setAutoReverse(true);
-		t1.setByY(100);
-		t1.setNode(c1);
-		
-		TranslateTransition t2 = new TranslateTransition();
-		t2.setDuration(Duration.seconds(1.5));
-		t2.setAutoReverse(true);
-		t2.setByY(100);
-		t2.setNode(c2);
-		
-		TranslateTransition t3 = new TranslateTransition();
-		t3.setDuration(Duration.seconds(1.5));
-		t3.setAutoReverse(true);
-		t3.setByY(100);
-		t3.setNode(c3);
-		
-		t1.play();
-		t2.play();
-		t3.play();
-		
-		return layout;
-	}
 	
 	//TODO: add graphics to code
 	public Scene guessLetter() {
@@ -411,6 +346,7 @@ public class WordGuessClient extends Application {
 					confirmButton.setDisable(true);
 					confirmButton.setOnAction(e -> {
 						//TODO: send an updated WordInfo to the server.
+						//	makeGuess(wordInfo.guess);
 						//TODO: put a transparent waiting background on top
 						//	of the layout until the server spits back an updated
 						//	WordInfo object.
@@ -467,6 +403,161 @@ public class WordGuessClient extends Application {
 		
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		return scene;
+	}
+	
+	//temporary scene for testing the server
+	public Scene createGame() {
+		
+		//Widgets
+		TextField tempTxt = new TextField();
+		Button sendGuess = new Button("Send Guess");
+		Button sendCat = new Button("Send Cat");
+		tempList = new ListView<String>();
+		VBox clientBox = new VBox(10, tempList, tempTxt, sendGuess, sendCat );
+		 
+		//button for sending a letter
+		sendGuess.setOnAction(e->
+		{
+			if(tempTxt.getText().length() == 1) {
+				//create a new object with the guess and send
+				WordInfo curGuess = guessRequest(tempTxt.getText().charAt(0));
+				clientConnection.send(curGuess); 
+				tempTxt.clear();
+			}
+			else
+			{
+				tempTxt.clear();
+				tempTxt.setText("Not one char");
+			}
+			
+		});
+		
+		//button for sending a category
+		sendCat.setOnAction(e->
+		{
+			int x = Integer.parseInt(tempTxt.getText());
+			if( x >= 1 && x <= 3) {
+				//create a new object with category and send
+				WordInfo curCategory = categoryRequest(x);
+				clientConnection.send(curCategory); 
+				tempTxt.clear();
+			}
+			else
+			{
+				tempTxt.clear();
+				tempTxt.setText("Not bewteen 1 and 3");
+			}
+			
+		});
+		
+		return new Scene(clientBox, 600, 500);
+		
+	}
+	
+	//Function called inside Platform Runlater
+	void gameLogic(WordInfo input) {
+		//keep track of categories cleared and guesses on client
+		++clientConnection.serverResponses;
+		System.out.println("num of server responses: " + clientConnection.serverResponses);
+		tempList.getItems().add(input.serverMessage);
+		
+		//welcome message was sent
+		if(clientConnection.serverResponses == 1) 
+		{
+			
+		}
+		//length of the word is being sent
+		else if(input.wordLength != 0) {
+			
+		}
+		//guess response is being done
+		else
+		{
+			//our guesss was correct
+			if(input.isCorrect){
+				
+			}
+			//our guess was incorrect
+			else {
+				
+			}
+			
+			//ran out of guesses
+			if(clientConnection.guesses == 0) {
+				
+				//ran out of lives
+				if(clientConnection.lives == 0) {
+					
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	//=======HELPER FUNCTIONS=======//
+	/*These are functions that are not specifically related to the GUI but
+		help the layouts function properly.
+	*/
+	
+	//Helper functions that effect the screen
+	public VBox makeLoadingScreen() {
+		//This will just be a loading layout that will appear when the user
+		//makes a selection
+		
+		VBox layout = new VBox();
+		layout.setOpacity(0.20);
+		layout.setStyle("-fx-background-color: white");
+		layout.setSpacing(100);
+		
+		Text loadingText = new Text("Loading");
+		loadingText.setFont(NARRATION_FONT);
+		
+		//Create animation to show that you are waiting... I guess.
+		//	This will be housed in a HBox
+		HBox animationLayout = new HBox();
+		animationLayout.setSpacing(20);
+		
+		Circle c1 = new Circle();
+		Circle c2 = new Circle();
+		Circle c3 = new Circle();
+		c1.setRadius(10);
+		c1.setFill(Color.BLACK);
+		c2.setRadius(10);
+		c2.setFill(Color.BLACK);
+		c3.setRadius(10);
+		c3.setFill(Color.BLACK);
+		
+		animationLayout.getChildren().addAll(c1, c2, c3);
+		animationLayout.setAlignment(Pos.CENTER);
+		
+		layout.getChildren().addAll(loadingText, animationLayout);
+		layout.setAlignment(Pos.CENTER);
+		
+		TranslateTransition t1 = new TranslateTransition();
+		t1.setDuration(Duration.seconds(1.5));
+		t1.setAutoReverse(true);
+		t1.setByY(100);
+		t1.setNode(c1);
+		
+		TranslateTransition t2 = new TranslateTransition();
+		t2.setDuration(Duration.seconds(1.5));
+		t2.setAutoReverse(true);
+		t2.setByY(100);
+		t2.setNode(c2);
+		
+		TranslateTransition t3 = new TranslateTransition();
+		t3.setDuration(Duration.seconds(1.5));
+		t3.setAutoReverse(true);
+		t3.setByY(100);
+		t3.setNode(c3);
+		
+		t1.play();
+		t2.play();
+		t3.play();
+		
+		return layout;
 	}
 	public HashMap<Button, Double> makeAlphabetMap(){
 		//Helper function to make the alphabet buttons. They are 
@@ -538,53 +629,19 @@ public class WordGuessClient extends Application {
 		return list;
 	}
 
-	//temporary scene for testing the server
-	public Scene createGame() {
-		
-		//Widgets
-		TextField tempTxt = new TextField();
-		Button sendGuess = new Button("Send Guess");
-		Button sendCat = new Button("Send Cat");
-		tempList = new ListView<String>();
-		VBox clientBox = new VBox(10, tempList, tempTxt, sendGuess, sendCat );
-		 
-		//button for sending a letter
-		sendGuess.setOnAction(e->
-		{
-			if(tempTxt.getText().length() == 1) {
-				//create a new object with the guess and send
-				WordInfo curGuess = guessRequest(tempTxt.getText().charAt(0));
-				clientConnection.send(curGuess); 
-				tempTxt.clear();
-			}
-			else
-			{
-				tempTxt.clear();
-				tempTxt.setText("Not one char");
-			}
-			
-		});
-		
-		//button for sending a category
-		sendCat.setOnAction(e->
-		{
-			int x = Integer.parseInt(tempTxt.getText());
-			if( x >= 1 && x <= 3) {
-				//create a new object with category and send
-				WordInfo curCategory = categoryRequest(x);
-				clientConnection.send(curCategory); 
-				tempTxt.clear();
-			}
-			else
-			{
-				tempTxt.clear();
-				tempTxt.setText("Not bewteen 1 and 3");
-			}
-			
-		});
-		
-		return new Scene(clientBox, 600, 500);
-		
+	//Helper functions that send information to server
+	public void selectCategory(int category){
+		//This is a helper function used to send a category to the client
+	
+		wordInfo = categoryRequest(category);
+		clientConnection.send(wordInfo);
+	
+		window.setScene(sceneMap.get("guess letter"));
+		window.show();
+	}
+	public void makeGuess(char letter) {
+		wordInfo = guessRequest(letter);
+		clientConnection.send(wordInfo);
 	}
 	
 	//create new object to pick category
@@ -594,7 +651,7 @@ public class WordGuessClient extends Application {
 		tempObj.serverMessage = "picked a category";
 		return tempObj;
 	}
-	
+		
 	//create new object to guess
 	WordInfo guessRequest(char x){
 		WordInfo tempObj = new WordInfo();
@@ -618,43 +675,5 @@ public class WordGuessClient extends Application {
 		tempObj.serverMessage = "clicked quit";
 		return tempObj;
 	}
-	
-	//Function called inside Platform Runlater
-	void gameLogic(WordInfo input) {
-		//keep track of categories cleared and guesses on client
-		++clientConnection.serverResponses;
-		System.out.println("num of server responses: " + clientConnection.serverResponses);
-		tempList.getItems().add(input.serverMessage);
 		
-		//welcome message was sent
-		if(clientConnection.serverResponses == 1) 
-		{
-			
-		}
-		//length of the word is being sent
-		else if(input.wordLength != 0) {
-			
-		}
-		//guess response is being done
-		else
-		{
-			//our guesss was correct
-			if(input.isCorrect){
-				
-			}
-			//our guess was incorrect
-			else {
-				
-			}
-			
-			//ran out of guesses
-			if(clientConnection.guesses == 0) {
-				
-				//ran out of lives
-				if(clientConnection.lives == 0) {
-					
-				}
-			}
-		}
-	}
 }
