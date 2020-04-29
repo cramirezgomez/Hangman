@@ -33,6 +33,7 @@ public class WordGuessClient extends Application {
 	public final Font NARRATION_FONT = new Font("Gil Sans", 20);
 	public final Font SMALLER_FONT = new Font("Gil Sans", 15);
 	
+	public final String HANGMAN_ICON = "https://www.pngkey.com/png/full/345-3454952_risco-de-suicdio-icon-hangmans-knot.png";
 
 
 	//Things needed for the Client-Server connection
