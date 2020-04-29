@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -12,10 +13,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-
+import javafx.util.Duration;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -59,7 +63,6 @@ public class WordGuessClient extends Application {
 		sceneMap.put("start",  createStart());
 		sceneMap.put("select category", selectCategory());
 		sceneMap.put("guess letter", guessLetter());
-		sceneMap.put("listen", listenForServer());
 		sceneMap.put("game",  createGame());
 		
 		window.setScene(sceneMap.get("title"));
@@ -233,7 +236,7 @@ public class WordGuessClient extends Application {
 		//Add the text to the topLayout
 		topLayout.getChildren().add(livesText);
 		topLayout.setAlignment(Pos.TOP_RIGHT);
-	
+		
 		//This VBox will hold the narration and buttons and put them in the 
 		//center
 		VBox centerLayout = new VBox();
@@ -293,56 +296,62 @@ public class WordGuessClient extends Application {
 	
 	}
 	
-	//TODO: add graphics to code
-	public Scene listenForServer(){
-		/*This scene will display until the server has
-		sent the WordInfo back to the client for the game
-			________________________________
-			|                               |
-			| 	                 			|
-			|								|
-			|		                    	|
-			|								|
-			|	   Waiting on Server...		|
-			|    						    |
-			| 								|
-			|	                			|
-			|								|
-			|								|
-			|								|
-			 ________________________________
-		*/
-	
-		//VBox that will handle the text (and possibly any animation that I want to include)
+	public VBox makeLoadingScreen() {
+		//This will just be a loading layout that will appear when the user
+		//makes a selection
+		
 		VBox layout = new VBox();
-		layout.setSpacing(20);
+		layout.setOpacity(0.20);
+		layout.setStyle("-fx-background-color: white");
+		layout.setSpacing(100);
 		
-		//This text lets the user know that we are waiting on server
-		Text waitingOnServerText = new Text("Waiting on Server");
-		waitingOnServerText.setFont(NARRATION_FONT);
-		waitingOnServerText.setWrappingWidth(300);
-		waitingOnServerText.setTextAlignment(TextAlignment.CENTER);
-	
-		/*TODO: Create something that gets the WordInfo from the client
-		and moves to the next scene. For example:
+		Text loadingText = new Text("Loading");
+		loadingText.setFont(NARRATION_FONT);
 		
-		while(true){
-			if(clientConnection.readObject() != null){
-				//This means client has recieved the object
-				window.setScene(sceneMap.get("guess a letter"));
-				window.show();
-			}
-		}
+		//Create animation to show that you are waiting... I guess.
+		//	This will be housed in a HBox
+		HBox animationLayout = new HBox();
+		animationLayout.setSpacing(20);
 		
-		*/
-	
-		//Add text to the layout
-		layout.getChildren().addAll(waitingOnServerText);
+		Circle c1 = new Circle();
+		Circle c2 = new Circle();
+		Circle c3 = new Circle();
+		c1.setRadius(10);
+		c1.setFill(Color.BLACK);
+		c2.setRadius(10);
+		c2.setFill(Color.BLACK);
+		c3.setRadius(10);
+		c3.setFill(Color.BLACK);
+		
+		animationLayout.getChildren().addAll(c1, c2, c3);
+		animationLayout.setAlignment(Pos.CENTER);
+		
+		layout.getChildren().addAll(loadingText, animationLayout);
 		layout.setAlignment(Pos.CENTER);
-	
-		//Add layout to the scene and return
-		Scene scene = new Scene(layout, WIDTH, HEIGHT);
-		return scene;
+		
+		TranslateTransition t1 = new TranslateTransition();
+		t1.setDuration(Duration.seconds(1.5));
+		t1.setAutoReverse(true);
+		t1.setByY(100);
+		t1.setNode(c1);
+		
+		TranslateTransition t2 = new TranslateTransition();
+		t2.setDuration(Duration.seconds(1.5));
+		t2.setAutoReverse(true);
+		t2.setByY(100);
+		t2.setNode(c2);
+		
+		TranslateTransition t3 = new TranslateTransition();
+		t3.setDuration(Duration.seconds(1.5));
+		t3.setAutoReverse(true);
+		t3.setByY(100);
+		t3.setNode(c3);
+		
+		t1.play();
+		t2.play();
+		t3.play();
+		
+		return layout;
 	}
 	
 	//TODO: add graphics to code
