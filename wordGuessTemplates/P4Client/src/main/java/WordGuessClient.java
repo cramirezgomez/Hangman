@@ -360,6 +360,7 @@ public class WordGuessClient extends Application {
 					confirmButton.setOnAction(e -> {
 						//TODO: send an updated WordInfo to the server.
 						//	makeGuess(wordInfo.guess);
+						clientConnection.send(wordInfo); 
 						//TODO: put a transparent waiting background on top
 						//	of the layout until the server spits back an updated
 						//	WordInfo object.
@@ -385,26 +386,38 @@ public class WordGuessClient extends Application {
 							//Assign each button to one of three rows (much like a keyboard)
 							//and have each button perform the same action event
 							for(Button b : row1Button) {
-								b.setOnAction(e -> {
+								/*b.setOnAction(e -> {
 									confirmButton.setDisable(false);
 									//TODO: Update WordInfo
-								});
+								});*/
 								row1.getChildren().add(b);
 							}
 							for(Button b : row2Button) {
-								b.setOnAction(e -> {
+								/*b.setOnAction(e -> {
 									confirmButton.setDisable(false);
 									//TODO: Update WordInfo
-								});
+								});*/
 								row2.getChildren().add(b);
 							}
 							for(Button b : row3Button) {
-								b.setOnAction(e -> {
+								/*b.setOnAction(e -> {
 									confirmButton.setDisable(false);
 									//TODO: Update WordInfo
-								});
+								});*/
 								row3.getChildren().add(b);
 							}
+							//setup event handlers for all the buttons
+							buttonMap.forEach((button, value) -> {
+								button.setOnAction(e->
+								{
+									confirmButton.setDisable(false);
+									wordInfo = guessRequest(button.getText().toLowerCase().charAt(0));
+									button.setDisable(true);
+									//clientConnection.send(curGuess); 
+								});
+							});
+							
+							
 					alphabetButtonLayout.getChildren().addAll(row1, row2, row3);
 					alphabetButtonLayout.setAlignment(Pos.CENTER);
 				userInputLayout.getChildren().addAll(alphabetButtonLayout, confirmButton);
@@ -477,32 +490,32 @@ public class WordGuessClient extends Application {
 		//welcome message was sent
 		if(clientConnection.serverResponses == 1) 
 		{
-			
+			System.out.println("Recieved: welcome message");
 		}
 		//length of the word is being sent
 		else if(input.wordLength != 0) {
-			
+			System.out.println("Recieved: length of word is " + input.wordLength);
 		}
 		//guess response is being done
 		else
 		{
 			//our guesss was correct
 			if(input.isCorrect){
-				
+				System.out.println("Recieved: guess was correct");
 			}
 			//our guess was incorrect
 			else {
-				
+				System.out.println("Recieved: guess was wrong");
 			}
 			
 			//ran out of guesses
 			if(clientConnection.guesses == 0) {
-				
+				System.out.println("Also Recieved: ran out of guesses");
 				//ran out of lives
 				if(clientConnection.catOneLives == 0 || 
 				   clientConnection.catTwoLives == 0 || 
 				   clientConnection.catThreeLives == 0) {
-					
+					System.out.println("Also Recieved: ran out of lives");
 				}
 			}
 		}
@@ -611,6 +624,7 @@ public class WordGuessClient extends Application {
 		alphabetMap.put(new Button("B"), 3.4);
 		alphabetMap.put(new Button("N"), 3.5);
 		alphabetMap.put(new Button("M"), 3.6);
+		
 		
 		return alphabetMap;
 	}
