@@ -261,7 +261,7 @@ public class Server {
 			
 			
 			//outer game logic function
-			void execLogic(WordInfo input) 
+			int execLogic(WordInfo input) 
 			{
 				//client wants to play again
 				if(input.playAgain) 
@@ -269,6 +269,7 @@ public class Server {
 					//If the player wants to play again reset their information
 					//and refill the word banks
 					resetWordBanks();
+					return 1;
 				}
 				//client wants to quit
 				if(input.quit) 
@@ -281,21 +282,27 @@ public class Server {
 						
 						//Remove the client from the clients array 
 						clients.remove(count - 1);
+						return 2;
 					}
-					catch(Exception e){}
+					catch(Exception e){ return -1;}
 					
 				}
 				//client guessed a char
 				if(input.guess != ' ') 
 				{
 					sendClientResponse(handleGuess(input));
+					return 3;
 				}
 				if(input.category != 0) 
 				{
 					pickWordFromBank(input.category); 
 					WordInfo lengthInfo = prepareLength();
 					sendClientResponse(lengthInfo);
+					
+					return 4;
 				}
+				 
+				return 0;
 			}
 			
 		}
