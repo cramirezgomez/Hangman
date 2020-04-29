@@ -18,7 +18,9 @@ public class Client extends Thread{
 	int guesses;
 	
 	ArrayList<Boolean> catCleared;
-	int lives;
+	int catOneLives;
+	int catTwoLives;
+	int catThreeLives;
 	int serverResponses;
 	
 	private Consumer<Serializable> callback;
@@ -34,7 +36,9 @@ public class Client extends Thread{
 		this.catCleared.add(false);
 		
 		serverResponses = 0;
-		this.lives = 3;
+		this.catOneLives = 3;
+		this.catTwoLives = 3;
+		this.catThreeLives = 3;
 		
 	}
 	
@@ -60,7 +64,9 @@ public class Client extends Thread{
 		this.catCleared.add(false);
 		
 		serverResponses = 0;
-		this.lives = 3;
+		this.catOneLives = 3;
+		this.catTwoLives = 3;
+		this.catThreeLives = 3;
 	}
 	
 	void resetVariables() 
@@ -70,7 +76,9 @@ public class Client extends Thread{
 		this.catCleared.add(false);
 		this.catCleared.add(false);
 		this.guesses = 6;
-		this.lives = 3;
+		this.catOneLives = 3;
+		this.catTwoLives = 3;
+		this.catThreeLives = 3;
 		
 		//might need this or not
 		//serverResponses = 0;

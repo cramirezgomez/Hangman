@@ -233,11 +233,18 @@ public class WordGuessClient extends Application {
 		VBox topLayout = new VBox();
 		
 		//this text is for the lives
-		Text livesText = new Text("Lives: " + clientConnection.lives);
-		livesText.setFont(SMALLER_FONT);
+		Text livesText1 = new Text("Fruit Lives: " + clientConnection.catOneLives);
+		Text livesText2 = new Text("Color Lives: " + clientConnection.catTwoLives);
+		Text livesText3 = new Text("Animal Lives: " + clientConnection.catThreeLives);
+		livesText1.setFont(SMALLER_FONT);
+		livesText2.setFont(SMALLER_FONT);
+		livesText3.setFont(SMALLER_FONT);
 		
 		//Add the text to the topLayout
-		topLayout.getChildren().add(livesText);
+		topLayout.getChildren().add(livesText1);
+		topLayout.getChildren().add(livesText2);
+		topLayout.getChildren().add(livesText3);
+		
 		topLayout.setAlignment(Pos.TOP_RIGHT);
 		
 		//This VBox will hold the narration and buttons and put them in the 
@@ -317,9 +324,15 @@ public class WordGuessClient extends Application {
 			//This VBox will hold the information regarding the player's life
 			//and put them in the top
 			VBox topLayout = new VBox();
-				Text livesText = new Text("Lives: " + clientConnection.lives);
-				livesText.setFont(SMALLER_FONT);
-			topLayout.getChildren().add(livesText);
+				Text livesText1 = new Text("Fruit Lives: " + clientConnection.catOneLives);
+				Text livesText2 = new Text("Color Lives: " + clientConnection.catTwoLives);
+				Text livesText3 = new Text("Animal Lives: " + clientConnection.catThreeLives);
+				livesText1.setFont(SMALLER_FONT);
+				livesText2.setFont(SMALLER_FONT);
+				livesText3.setFont(SMALLER_FONT);
+			topLayout.getChildren().add(livesText1);
+			topLayout.getChildren().add(livesText2);
+			topLayout.getChildren().add(livesText3);
 			topLayout.setAlignment(Pos.TOP_RIGHT);
 			
 			//Create the centerLayout. This will tell the user the information to
@@ -486,7 +499,9 @@ public class WordGuessClient extends Application {
 			if(clientConnection.guesses == 0) {
 				
 				//ran out of lives
-				if(clientConnection.lives == 0) {
+				if(clientConnection.catOneLives == 0 || 
+				   clientConnection.catTwoLives == 0 || 
+				   clientConnection.catThreeLives == 0) {
 					
 				}
 			}
