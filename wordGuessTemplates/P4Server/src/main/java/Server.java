@@ -224,7 +224,7 @@ public class Server {
 					
 					if(curWord.charAt(i) == input.guess)
 					{
-						results.positions.add(i + 1);
+						results.positions.add(i);
 						results.isCorrect = true;
 					}
 				}
