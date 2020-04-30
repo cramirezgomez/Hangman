@@ -10,7 +10,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
@@ -29,11 +28,17 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 public class WordGuessClient extends Application {
-	//Things needed for the GUI
+	//--Things needed for the GUI--//
+	
+	//Things needed to display
 	protected Stage window;
 	protected HashMap<String, Scene> sceneMap;
+	
+	//Things needed for dimensions
 	public final int WIDTH = 600;
 	public final int HEIGHT = 500;
+	
+	//Things needed for the font
 	public final Font TITLE_FONT = new Font("Gil Sans", 50);
 	public final Font NARRATION_FONT = new Font("Gil Sans", 20);
 	public final Font SMALLER_FONT = new Font("Gil Sans", 15);
@@ -55,9 +60,8 @@ public class WordGuessClient extends Application {
 	Text livesText3Guess;
 
 
-	//Things needed for the Client-Server connection
+	//--Things needed for the Client-Server connection--//
 	public Client clientConnection = new Client();
-	ListView<String> tempList;
 	int portNum;
 	String IPAddress;
 	
@@ -83,15 +87,18 @@ public class WordGuessClient extends Application {
 		 into a method to keep the clutter to a minimum
 		*/
 		sceneMap = new HashMap<String, Scene>();
-		sceneMap.put("title", titlePage());
-		sceneMap.put("start",  createStart());
+		sceneMap.put("title page", titlePage());
+		sceneMap.put("create start",  createStart());
 		sceneMap.put("select category", selectCategory());
 		sceneMap.put("guess letter", guessLetter());
-		sceneMap.put("game",  createGame());
+		sceneMap.put("win layout", winLoseLayout(true));
+		sceneMap.put("lose layout", winLoseLayout(false));
 		
-		window.setScene(sceneMap.get("title"));
+		//set the scene to the title page and show
+		window.setScene(sceneMap.get("title page"));
 		window.show();
 		
+		//disconnect client to server when exiting game
 		window.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent t) {
@@ -110,6 +117,7 @@ public class WordGuessClient extends Application {
 		
 	}
 
+	//These functions are the scenes that the game uses
 	public Scene titlePage() {
 		/*This will just be the start page, so for now, 
 		it will just have the title and the button to 
@@ -131,17 +139,20 @@ public class WordGuessClient extends Application {
 			________________________________
 		 */
 		
-		HBox layout1 = new HBox();
-		layout1.setSpacing(10);
-		layout1.setStyle("-fx-background-color: burlywood");
+		//Main layout will show the image, title, and start button
+		HBox layout = new HBox();
+		layout.setSpacing(10);
+		layout.setStyle("-fx-background-color: burlywood");
 		
-		ImageView ropeImage = new ImageView(new Image("Hangman Icon.png"));
-		ropeImage.setFitWidth(250);
-		ropeImage.setFitHeight(500);
-		ropeImage.setPreserveRatio(true);
+		//This is the image
+		ImageView hangmanImage = new ImageView(new Image("Hangman Icon.png"));
+		hangmanImage.setFitWidth(250);
+		hangmanImage.setFitHeight(500);
+		hangmanImage.setPreserveRatio(true);
 		
-		VBox layout = new VBox();
-		layout.setSpacing(100);
+		//This layout will show the title and button
+		VBox titleLayout = new VBox();
+		titleLayout.setSpacing(100);
 		
 		//This will be for the title
 		Text title = new Text("Welcome to Word Guess!");
@@ -154,23 +165,24 @@ public class WordGuessClient extends Application {
 		startGameButton.setStyle("-fx-base: chocolate");
 		startGameButton.setOnAction(e -> {
 			//set the scene to createStart()
-			window.setScene(sceneMap.get("start"));
+			window.setScene(sceneMap.get("create start"));
 			window.show();
 		});
 	
-		//Add these two nodes to the layout and return
-		layout.getChildren().addAll(title, startGameButton);
-		layout.setAlignment(Pos.CENTER);
+		//Add title and button to title layout
+		titleLayout.getChildren().addAll(title, startGameButton);
+		titleLayout.setAlignment(Pos.CENTER);
 		
-		layout1.getChildren().addAll(ropeImage, layout);
-		layout1.setAlignment(Pos.CENTER_LEFT);
+		//Add image and title layout to main layout
+		layout.getChildren().addAll(hangmanImage, titleLayout);
+		layout.setAlignment(Pos.CENTER_LEFT);
 		
 		//Added fade in transition when the game starts
-		FadeTransition fade = fadeIn(3.0);
-		fade.setNode(layout1);
-		fade.play();
+		FadeTransition fadeIn = fadeIn(3.0);
+		fadeIn.setNode(layout);
+		fadeIn.play();
 		
-		Scene scene = new Scene(layout1, WIDTH, HEIGHT);
+		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		
 		return scene;
 	}
@@ -243,6 +255,11 @@ public class WordGuessClient extends Application {
 		btnConnect.setGraphic(makeImageView(new Image("Confirm Icon.png"), 15, 15));
 		btnConnect.setStyle("-fx-base: forestgreen");
 		
+		//Added fade in transition
+		FadeTransition fade = fadeIn(1.0);
+		fade.setNode(clientBox);
+		fade.play();
+		
 		return new Scene(clientBox, 600, 500);
 		
 	}
@@ -285,7 +302,6 @@ public class WordGuessClient extends Application {
 		
 		//Add the text to the topLayout
 		topLayout.getChildren().addAll(livesText1Cat, livesText2Cat, livesText3Cat);
-		
 		topLayout.setAlignment(Pos.TOP_RIGHT);
 		
 		//This VBox will hold the narration and buttons and put them in the 
@@ -300,27 +316,31 @@ public class WordGuessClient extends Application {
 		//This HBox is for the buttons
 		HBox buttonLayout = new HBox();
 		
-		//Create images for the categories
+		//Create image-buttons for the categories
 		fruitImage = makeImageView(new Image("Fruit Icon.png"), 200, 200);
 		colorImage = makeImageView(new Image("Color Icon.png"), 200, 200);
 		animalImage = makeImageView(new Image("Animal Icon.png"), 200, 200);
 	
 		//Create event handlers for when the player picks a category
-		//(selectCategory(int category) is a helper function)
 		makeCategoryEvents();
 	
-		//Add the buttons in the HBox
+		//Add the image-buttons to the button layout
 		buttonLayout.getChildren().addAll(fruitImage, colorImage, animalImage);
 		buttonLayout.setAlignment(Pos.CENTER);
 	
-		//Add the narration and buttonLayout in the VBox
+		//Add the narration and buttonLayout in the center layout
 		centerLayout.getChildren().addAll(selectCategoryText, buttonLayout);
 		centerLayout.setAlignment(Pos.CENTER);
 	
-		//Add the text and other information in their respected positions
+		//Add the layouts to their respected places in the border pane
 		layout.setTop(topLayout);
 		layout.setCenter(centerLayout);
-	
+		
+		//Added fade in transition
+		FadeTransition fade = fadeIn(1.0);
+		fade.setNode(layout);
+		fade.play();
+		
 		//create scene and return
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		return scene;
@@ -391,7 +411,6 @@ public class WordGuessClient extends Application {
 					confirmButton.setOnAction(e -> {
 						confirmButton.setDisable(true);
 						//sends an updated WordInfo to the server.
-						//	makeGuess(wordInfo.guess);
 						clientConnection.send(wordInfo); 
 						//search for the correct button to disable
 						buttonMap.forEach((button, value) -> {
@@ -439,8 +458,6 @@ public class WordGuessClient extends Application {
 								{
 									confirmButton.setDisable(false);
 									wordInfo = guessRequest(button.getText().toLowerCase().charAt(0));
-									//button.setDisable(true);
-									//clientConnection.send(curGuess); 
 								});
 							});
 					alphabetButtonLayout.getChildren().addAll(row1, row2, row3);
@@ -481,12 +498,11 @@ public class WordGuessClient extends Application {
 		
 		playAgainButton.setStyle("-fx-base: chocolate");
 		playAgainButton.setOnAction(e -> {
-			//TODO: reset clientConnection information and go to title page
-			window.setScene(sceneMap.get("title"));
+			selectPlayAgain();
 		});
 		exitButton.setStyle("-fx-base: firebrick");
-		exitButton.setOnAction(eo -> {
-			window.close();
+		exitButton.setOnAction(e -> {
+			selectQuit();
 		});
 		
 		buttonLayout.getChildren().addAll(playAgainButton, exitButton);
@@ -495,57 +511,13 @@ public class WordGuessClient extends Application {
 		layout.getChildren().addAll(winLoseText, buttonLayout);
 		layout.setAlignment(Pos.CENTER);
 		
+		//Added fade in transition when the game starts
+		FadeTransition fade = fadeIn(1.0);
+		fade.setNode(layout);
+		fade.play();
+		
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		return scene;
-	}
-	
-	//temporary scene for testing the server
-	public Scene createGame() {
-		
-		//Widgets
-		TextField tempTxt = new TextField();
-		Button sendGuess = new Button("Send Guess");
-		Button sendCat = new Button("Send Cat");
-		tempList = new ListView<String>();
-		VBox clientBox = new VBox(10, tempList, tempTxt, sendGuess, sendCat );
-		 
-		//button for sending a letter
-		sendGuess.setOnAction(e->
-		{
-			if(tempTxt.getText().length() == 1) {
-				//create a new object with the guess and send
-				WordInfo curGuess = guessRequest(tempTxt.getText().charAt(0));
-				clientConnection.send(curGuess); 
-				tempTxt.clear();
-			}
-			else
-			{
-				tempTxt.clear();
-				tempTxt.setText("Not one char");
-			}
-			
-		});
-		
-		//button for sending a category
-		sendCat.setOnAction(e->
-		{
-			int x = Integer.parseInt(tempTxt.getText());
-			if( x >= 1 && x <= 3) {
-				//create a new object with category and send
-				WordInfo curCategory = categoryRequest(x);
-				clientConnection.send(curCategory); 
-				tempTxt.clear();
-			}
-			else
-			{
-				tempTxt.clear();
-				tempTxt.setText("Not bewteen 1 and 3");
-			}
-			
-		});
-		
-		return new Scene(clientBox, 600, 500);
-		
 	}
 	
 	//Function called inside Platform Runlater
@@ -553,7 +525,6 @@ public class WordGuessClient extends Application {
 		//keep track of categories cleared and guesses on client
 		++clientConnection.serverResponses;
 		System.out.println("num of server responses: " + clientConnection.serverResponses);
-		tempList.getItems().add(input.serverMessage);
 		
 		//welcome message was sent
 		if(clientConnection.serverResponses == 1) 
@@ -565,8 +536,8 @@ public class WordGuessClient extends Application {
 			System.out.println("Recieved: length of word is " + input.wordLength);
 			clientConnection.lettersLeft = input.wordLength;
 			clientConnection.curWord = "";
-			for(int i = 0; i <input.wordLength; ++i) {
-				clientConnection.curWord = clientConnection.curWord + '*';
+			for(int i = 0; i < input.wordLength; ++i) {
+				clientConnection.curWord = clientConnection.curWord + "*";
 			}
 			wordText.setText(clientConnection.curWord);
 		}
@@ -578,7 +549,7 @@ public class WordGuessClient extends Application {
 				System.out.println("Recieved: guess was correct");
 				clientConnection.lettersLeft = clientConnection.lettersLeft - input.positions.size();
 				input.positions.forEach(e -> {
-					clientConnection.curWord = clientConnection.curWord.substring(0, e) + wordInfo.guess +
+					clientConnection.curWord = clientConnection.curWord.substring(0, e) + Character.toUpperCase(wordInfo.guess) +
 											   clientConnection.curWord.substring(e + 1);
 				});
 				//word was guessed
@@ -608,7 +579,7 @@ public class WordGuessClient extends Application {
 							break;
 					}
 					
-					window.setScene(winLoseLayout(true));
+					window.setScene(sceneMap.get("win layout"));
 					
 					enableKeyboard();
 					clientConnection.resetGuesses();
@@ -664,7 +635,7 @@ public class WordGuessClient extends Application {
 				   clientConnection.catLives.get(2) == 0) 
 				{
 				   System.out.println("Also Recieved: ran out of lives");
-				   window.setScene(winLoseLayout(false));
+				   window.setScene(sceneMap.get("lose layout"));
 				   enableCategories();
 					
 				}
@@ -679,12 +650,12 @@ public class WordGuessClient extends Application {
 	}
 	
 	
-	
-	
+	//===========================HELPER FUNCTIONS=======================//
 	//=======HELPER FUNCTIONS=======//
-	/*These are functions that are not specifically related to the GUI but
-		help the layouts function properly.
-	*/
+	//These are functions that are related to the GUI and help the layouts
+	//							function properly.
+	
+	//These functions add effects to layouts
 	
 	//Helper functions that effect the screen
 	public VBox makeLoadingScreen() {
@@ -744,13 +715,20 @@ public class WordGuessClient extends Application {
 		
 		return layout;
 	}
-
 	//Helper functions that make special effects
 	public FadeTransition fadeIn(double seconds) {
 		FadeTransition fade = new FadeTransition();
-		fade.setDuration(Duration.seconds(6));
+		fade.setDuration(Duration.seconds(seconds));
 		fade.setFromValue(0.01);
 		fade.setToValue(1);
+		
+		return fade;
+	}
+	public FadeTransition fadeOut(double seconds) {
+		FadeTransition fade = new FadeTransition();
+		fade.setDuration(Duration.seconds(seconds));
+		fade.setFromValue(1);
+		fade.setToValue(0);
 		
 		return fade;
 	}
@@ -767,6 +745,7 @@ public class WordGuessClient extends Application {
 		return shadow;
 	}
 	
+	//These functions modify the nodes being used in certain layouts
 	//Helper functions that effect the nodes in the layouts
 	public HashMap<Button, Double> makeAlphabetMap(){
 		//Helper function to make the alphabet buttons. They are 
@@ -881,8 +860,18 @@ public class WordGuessClient extends Application {
 			animalImage.setEffect(null);
 		});
 	}
+	void enableKeyboard() {
+		buttonMap.forEach((button, value) -> {
+				button.setDisable(false);
+		});
+	}
+	void enableCategories() {
+		fruitImage.setDisable(false);
+		colorImage.setDisable(false);
+		animalImage.setDisable(false);
+	}
 	
-	
+	//These functions send messages to server
 	//Helper functions that send information to server
 	public void selectCategory(int category){
 		//This is a helper function used to send a category to the client
@@ -893,52 +882,49 @@ public class WordGuessClient extends Application {
 		window.setScene(sceneMap.get("guess letter"));
 		window.show();
 	}
-	public void makeGuess(char letter) {
-		wordInfo = guessRequest(letter);
+	//create new object to pick category
+	public void selectPlayAgain() {
+		wordInfo = playAgainRequest();
 		clientConnection.send(wordInfo);
+		//TODO: Reset the player's guesses and 
+		//		things here since they want to 
+		//		play again
+		try {
+			start(window);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	public void selectQuit() {
+		wordInfo = playAgainRequest();
+		clientConnection.send(wordInfo);
+		window.close();
 	}
 	
-	//create new object to pick category
+	//These functions create the object that will be sent to server
 	WordInfo categoryRequest(int x){
 		WordInfo tempObj = new WordInfo();
 		tempObj.category = x;
 		tempObj.serverMessage = "picked a category";
 		return tempObj;
 	}
-		
-	//create new object to guess
 	WordInfo guessRequest(char x){
 		WordInfo tempObj = new WordInfo();
 		tempObj.guess = x;
 		tempObj.serverMessage = "sent a guess";
 		return tempObj;
 	}
-	
-	//create new object to play again
 	WordInfo playAgainRequest(){
 		WordInfo tempObj = new WordInfo();
 		tempObj.playAgain = true;
 		tempObj.serverMessage = "clicked play again";
 		return tempObj;
 	}
-	
-	//create new object to quit
 	WordInfo quitRequest(){
 		WordInfo tempObj = new WordInfo();
 		tempObj.quit = true;
 		tempObj.serverMessage = "clicked quit";
 		return tempObj;
-	}
-	
-	void enableKeyboard() {
-		buttonMap.forEach((button, value) -> {
-				button.setDisable(false);
-		});
-	}
-	void enableCategories() {
-		fruitImage.setDisable(false);
-		colorImage.setDisable(false);
-		animalImage.setDisable(false);
 	}
 		
 }

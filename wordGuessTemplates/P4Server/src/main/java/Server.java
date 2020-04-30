@@ -136,18 +136,39 @@ public class Server {
 				
 				//Fruits
 				wordBank1.add("apple");
-				wordBank1.add("grapes");
+				wordBank1.add("grape");
 				wordBank1.add("pineapple");
+				wordBank1.add("banana");
+				wordBank1.add("mango");
+				wordBank1.add("kiwi");
+				wordBank1.add("cherry");
+				wordBank1.add("lime");
+				wordBank1.add("lemon");
+				wordBank1.add("pear");
 				
 				//Colors 
 				wordBank2.add("blue");
 				wordBank2.add("orange");
 				wordBank2.add("red");
+				wordBank2.add("yellow");
+				wordBank2.add("black");
+				wordBank2.add("white");
+				wordBank2.add("purple");
+				wordBank2.add("green");
+				wordBank2.add("brown");
+				wordBank2.add("grey");
 				
 				//Animals 
 				wordBank3.add("tiger");
 				wordBank3.add("zebra");
 				wordBank3.add("bear");
+				wordBank3.add("snake");
+				wordBank3.add("lion");
+				wordBank3.add("eagle");
+				wordBank3.add("mouse");
+				wordBank3.add("frog");
+				wordBank3.add("crocodile");
+				wordBank3.add("chicken");
 				
 				//Shuffle the words inside each category 
 				Collections.shuffle(wordBank1); 
@@ -235,7 +256,6 @@ public class Server {
 				//Store the index positions of that guess in the array 
 				for(int i = 0; i < curWord.length(); i++)
 				{
-					
 					if(curWord.charAt(i) == input.guess)
 					{
 						results.positions.add(i);

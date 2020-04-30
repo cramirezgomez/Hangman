@@ -67,7 +67,7 @@ HashMap<String, Scene> sceneMap;
 //      VVVVVV
 		portNumber.setText("5555"); //Used to avoid entering 5555 all the time 
 		//-------------//
-		
+
 		//---Server GUI--//
 		listItems = new ListView<String>();
 		listItems.setStyle("-fx-font-size: 25;"+"-fx-border-size: 20;"+ 
