@@ -116,6 +116,17 @@ public class Server {
 				resetWordBanks();
 			}
 			
+			//Testing 
+			ClientThread()
+			{
+				wordBank1 = new ArrayList<String>();
+				wordBank2 = new ArrayList<String>();
+				wordBank3 = new ArrayList<String>();
+				
+				//Reset and Refill Word Categories 
+				resetWordBanks();
+			}
+			
 			//Reset Word Categories 
 			void resetWordBanks()
 			{
@@ -123,14 +134,17 @@ public class Server {
 				wordBank2.clear();
 				wordBank3.clear();
 				
+				//Fruits
 				wordBank1.add("apple");
 				wordBank1.add("grapes");
 				wordBank1.add("pineapple");
 				
+				//Colors 
 				wordBank2.add("blue");
 				wordBank2.add("orange");
 				wordBank2.add("red");
 				
+				//Animals 
 				wordBank3.add("tiger");
 				wordBank3.add("zebra");
 				wordBank3.add("bear");
@@ -259,7 +273,6 @@ public class Server {
 				return len; 
 			}
 			
-			
 			//outer game logic function
 			int execLogic(WordInfo input) 
 			{
@@ -284,7 +297,7 @@ public class Server {
 						clients.remove(count - 1);
 						return 2;
 					}
-					catch(Exception e){ return -1;}
+					catch(Exception e){ return 2;}
 					
 				}
 				//client guessed a char
