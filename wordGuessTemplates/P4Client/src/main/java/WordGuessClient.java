@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javafx.animation.FadeTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -11,6 +12,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Shadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -33,12 +39,11 @@ public class WordGuessClient extends Application {
 	public final Font NARRATION_FONT = new Font("Gil Sans", 20);
 	public final Font SMALLER_FONT = new Font("Gil Sans", 15);
 	
-	public final String HANGMAN_ICON = "https://www.pngkey.com/png/full/345-3454952_risco-de-suicdio-icon-hangmans-knot.png";
 	//Widgets needed in other functions
 	Text wordText ;
-	Button fruitBtn;
-	Button colorBtn;
-	Button animalBtn;
+	ImageView fruitImage;
+	ImageView colorImage;
+	ImageView animalImage;
 	HashMap<Button, Double> buttonMap;
 	Text narrationText;
 	
@@ -72,6 +77,7 @@ public class WordGuessClient extends Application {
 		*/
 		window = primaryStage;
 		window.setTitle("(Client) Word Guess!!!");
+		window.getIcons().add(new Image("Game Logo.png"));
 		
 		/*We create the scenes and put them here. 
 		As the number of scenes grow we may need to move this
@@ -105,7 +111,6 @@ public class WordGuessClient extends Application {
 		
 	}
 
-	//TODO: Add graphics to code
 	public Scene titlePage() {
 		/*This will just be the start page, so for now, 
 		it will just have the title and the button to 
@@ -126,9 +131,18 @@ public class WordGuessClient extends Application {
 			|								|
 			________________________________
 		 */
-
+		
+		HBox layout1 = new HBox();
+		layout1.setSpacing(10);
+		layout1.setStyle("-fx-background-color: burlywood");
+		
+		ImageView ropeImage = new ImageView(new Image("Hangman Icon.png"));
+		ropeImage.setFitWidth(250);
+		ropeImage.setFitHeight(500);
+		ropeImage.setPreserveRatio(true);
+		
 		VBox layout = new VBox();
-		layout.setSpacing(200);
+		layout.setSpacing(100);
 		
 		//This will be for the title
 		Text title = new Text("Welcome to Word Guess!");
@@ -138,6 +152,7 @@ public class WordGuessClient extends Application {
 	
 		//This will be for the button
 		Button startGameButton = new Button("Start Game");
+		startGameButton.setStyle("-fx-base: chocolate");
 		startGameButton.setOnAction(e -> {
 			//set the scene to createStart()
 			window.setScene(sceneMap.get("start"));
@@ -148,11 +163,19 @@ public class WordGuessClient extends Application {
 		layout.getChildren().addAll(title, startGameButton);
 		layout.setAlignment(Pos.CENTER);
 		
-		Scene scene = new Scene(layout, WIDTH, HEIGHT);
+		layout1.getChildren().addAll(ropeImage, layout);
+		layout1.setAlignment(Pos.CENTER_LEFT);
+		
+		//Added fade in transition when the game starts
+		FadeTransition fade = fadeIn(3.0);
+		fade.setNode(layout1);
+		fade.play();
+		
+		Scene scene = new Scene(layout1, WIDTH, HEIGHT);
+		
 		return scene;
 	}
 	
-	//TODO: add graphics to this
 	public Scene createStart() {
 		/*Input ip address and port number
 	
@@ -194,6 +217,7 @@ public class WordGuessClient extends Application {
 		HBox clientBox = new HBox(col1, col2);
 		clientBox.setSpacing(20);
 		clientBox.setAlignment(Pos.CENTER);
+		clientBox.setStyle("-fx-background-color: burlywood");
 		
 		//Connect button event handler
 		btnConnect.setOnAction(e->{
@@ -216,11 +240,14 @@ public class WordGuessClient extends Application {
 			//Change scene after client is updated
 			window.setScene(sceneMap.get("select category"));
 		});
+		
+		btnConnect.setGraphic(makeImageView(new Image("Confirm Icon.png"), 15, 15));
+		btnConnect.setStyle("-fx-base: forestgreen");
+		
 		return new Scene(clientBox, 600, 500);
 		
 	}
 
-	//TODO: Add graphics to code
 	public Scene selectCategory(){
 		/*This will be the scene that lets the client
 		pick the specific category that they want
@@ -243,7 +270,8 @@ public class WordGuessClient extends Application {
 		//BorderPane will have the top display the Lives and the 
 		//center display the narration and buttons
 		BorderPane layout = new BorderPane();
-	
+		layout.setStyle("-fx-background-color: burlywood");
+		
 		//This VBox will hold the information regarding the player's life
 		//and put them in the top
 		VBox topLayout = new VBox();
@@ -257,16 +285,14 @@ public class WordGuessClient extends Application {
 		livesText3Cat.setFont(SMALLER_FONT);
 		
 		//Add the text to the topLayout
-		topLayout.getChildren().add(livesText1Cat);
-		topLayout.getChildren().add(livesText2Cat);
-		topLayout.getChildren().add(livesText3Cat);
+		topLayout.getChildren().addAll(livesText1Cat, livesText2Cat, livesText3Cat);
 		
 		topLayout.setAlignment(Pos.TOP_RIGHT);
 		
 		//This VBox will hold the narration and buttons and put them in the 
 		//center
 		VBox centerLayout = new VBox();
-		centerLayout.setSpacing(200);
+		centerLayout.setSpacing(100);
 	
 		//this text is for the narration
 		Text selectCategoryText = new Text("Select Category");
@@ -274,32 +300,18 @@ public class WordGuessClient extends Application {
 	
 		//This HBox is for the buttons
 		HBox buttonLayout = new HBox();
-		buttonLayout.setSpacing(15);
-	
-		//Create the buttons for the categories
-		fruitBtn = new Button("Fruit");
-		colorBtn = new Button("Color");
-		animalBtn = new Button("Animal");
+		
+		//Create images for the categories
+		fruitImage = makeImageView(new Image("Fruit Icon.png"), 200, 200);
+		colorImage = makeImageView(new Image("Color Icon.png"), 200, 200);
+		animalImage = makeImageView(new Image("Animal Icon.png"), 200, 200);
 	
 		//Create event handlers for when the player picks a category
 		//(selectCategory(int category) is a helper function)
-		fruitBtn.setOnAction(e -> {
-			clientConnection.curCat = 1;
-			selectCategory(1);
-		});
-	
-		colorBtn.setOnAction(e -> {
-			clientConnection.curCat = 2;
-			selectCategory(2);
-		});
-	
-		animalBtn.setOnAction(e -> {
-			clientConnection.curCat = 3;
-			selectCategory(3);
-		});
+		makeCategoryEvents();
 	
 		//Add the buttons in the HBox
-		buttonLayout.getChildren().addAll(fruitBtn, colorBtn, animalBtn);
+		buttonLayout.getChildren().addAll(fruitImage, colorImage, animalImage);
 		buttonLayout.setAlignment(Pos.CENTER);
 	
 		//Add the narration and buttonLayout in the VBox
@@ -340,6 +352,7 @@ public class WordGuessClient extends Application {
 		
 		//Create layout that will house all of these nodes
 		BorderPane layout = new BorderPane();
+		layout.setStyle("-fx-background-color: burlywood");
 			//This VBox will hold the information regarding the player's life
 			//and put them in the top
 			VBox topLayout = new VBox();
@@ -357,14 +370,13 @@ public class WordGuessClient extends Application {
 			//Create the centerLayout. This will tell the user the information to
 			//play, and hold the buttons the user will need to play
 			VBox centerLayout = new VBox();
-			centerLayout.setSpacing(100);
+			centerLayout.setSpacing(75);
 				int guesses = clientConnection.guesses;
 				narrationText = new Text("Guess a letter. You have " + guesses + " guesses left.");
 				narrationText.setFont(NARRATION_FONT);
 				narrationText.setWrappingWidth(300);
 				narrationText.setTextAlignment(TextAlignment.CENTER);
-				//TODO: Find out how to get the word from the server
-				String word = clientConnection.curWord;	//This will change when we get the word
+				String word = clientConnection.curWord;
 				wordText = new Text(word);
 				wordText.setFont(NARRATION_FONT);
 				wordText.setWrappingWidth(300);
@@ -375,6 +387,8 @@ public class WordGuessClient extends Application {
 				userInputLayout.setSpacing(50);
 					//Create confirm button
 					Button confirmButton = new Button("Confirm");
+					confirmButton.setGraphic(makeImageView(new Image("Confirm Icon.png"), 10, 10));
+					confirmButton.setStyle("-fx-base: forestgreen");
 					confirmButton.setDisable(true);
 					confirmButton.setOnAction(e -> {
 						confirmButton.setDisable(true);
@@ -417,24 +431,15 @@ public class WordGuessClient extends Application {
 							//Assign each button to one of three rows (much like a keyboard)
 							//and have each button perform the same action event
 							for(Button b : row1Button) {
-								/*b.setOnAction(e -> {
-									confirmButton.setDisable(false);
-									//TODO: Update WordInfo
-								});*/
+								b.setStyle("-fx-base: sandybrown");
 								row1.getChildren().add(b);
 							}
 							for(Button b : row2Button) {
-								/*b.setOnAction(e -> {
-									confirmButton.setDisable(false);
-									//TODO: Update WordInfo
-								});*/
+								b.setStyle("-fx-base: sandybrown");
 								row2.getChildren().add(b);
 							}
 							for(Button b : row3Button) {
-								/*b.setOnAction(e -> {
-									confirmButton.setDisable(false);
-									//TODO: Update WordInfo
-								});*/
+								b.setStyle("-fx-base: sandybrown");
 								row3.getChildren().add(b);
 							}
 							//setup event handlers for all the buttons
@@ -551,15 +556,15 @@ public class WordGuessClient extends Application {
 					{
 						case 1: 
 							System.out.println("1");
-							fruitBtn.setDisable(true);
+							fruitImage.setDisable(true);
 							break;
 						case 2:
 							System.out.println("2");
-							colorBtn.setDisable(true);
+							colorImage.setDisable(true);
 							break;
 						case 3:
 							System.out.println("3");
-							animalBtn.setDisable(true);
+							animalImage.setDisable(true);
 							break;
 						default:
 							
@@ -573,7 +578,7 @@ public class WordGuessClient extends Application {
 					enableKeyboard();
 					clientConnection.resetGuesses();
 					//game is won
-					if(colorBtn.isDisabled() && fruitBtn.isDisabled() && animalBtn.isDisabled())
+					if(colorImage.isDisabled() && fruitImage.isDisabled() && animalImage.isDisabled())
 					{
 						System.out.println("game was cleared");
 						enableCategories();
@@ -704,6 +709,30 @@ public class WordGuessClient extends Application {
 		
 		return layout;
 	}
+
+	//Helper functions that make special effects
+	public FadeTransition fadeIn(double seconds) {
+		FadeTransition fade = new FadeTransition();
+		fade.setDuration(Duration.seconds(6));
+		fade.setFromValue(0.01);
+		fade.setToValue(1);
+		
+		return fade;
+	}
+	public DropShadow makeShadow() {
+		DropShadow shadow = new DropShadow();
+		shadow.setHeight(10);
+		shadow.setWidth(10);
+		shadow.setRadius(10);
+		shadow.setOffsetX(5);
+		shadow.setOffsetY(5);
+		shadow.setBlurType(BlurType.GAUSSIAN);
+		shadow.setColor(Color.CHOCOLATE);
+		
+		return shadow;
+	}
+	
+	//Helper functions that effect the nodes in the layouts
 	public HashMap<Button, Double> makeAlphabetMap(){
 		//Helper function to make the alphabet buttons. They are 
 		//categorized by the row and order they would appear in on the keyboard
@@ -774,7 +803,48 @@ public class WordGuessClient extends Application {
 		
 		return list;
 	}
-
+	public ImageView makeImageView(Image image, double width, double height) {
+		ImageView imageView = new ImageView(image);
+		imageView.setFitWidth(width);
+		imageView.setFitHeight(height);
+		imageView.setPreserveRatio(true);
+		return imageView;
+	}
+	public void makeCategoryEvents() {
+		DropShadow shadow = makeShadow();
+		fruitImage.setOnMouseClicked(e -> {
+			clientConnection.curCat = 1;
+			selectCategory(1);
+		});
+		fruitImage.setOnMouseEntered(e -> {
+			fruitImage.setEffect(shadow);
+		});
+		fruitImage.setOnMouseExited(e -> {
+			fruitImage.setEffect(null);
+		});
+		colorImage.setOnMouseClicked(e -> {
+			clientConnection.curCat = 2;
+			selectCategory(2);
+		});
+		colorImage.setOnMouseEntered(e -> {
+			colorImage.setEffect(shadow);
+		});
+		colorImage.setOnMouseExited(e -> {
+			colorImage.setEffect(null);
+		});
+		animalImage.setOnMouseClicked(e ->{
+			clientConnection.curCat = 3;
+			selectCategory(3);
+		});
+		animalImage.setOnMouseEntered(e -> {
+			animalImage.setEffect(shadow);
+		});
+		animalImage.setOnMouseExited(e -> {
+			animalImage.setEffect(null);
+		});
+	}
+	
+	
 	//Helper functions that send information to server
 	public void selectCategory(int category){
 		//This is a helper function used to send a category to the client
@@ -828,9 +898,9 @@ public class WordGuessClient extends Application {
 		});
 	}
 	void enableCategories() {
-		fruitBtn.setDisable(false);
-		animalBtn.setDisable(false);
-		colorBtn.setDisable(false);
+		fruitImage.setDisable(false);
+		colorImage.setDisable(false);
+		animalImage.setDisable(false);
 	}
 		
 }
