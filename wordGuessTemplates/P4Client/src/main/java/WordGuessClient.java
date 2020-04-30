@@ -14,7 +14,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.BlurType;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -327,7 +326,6 @@ public class WordGuessClient extends Application {
 		return scene;
 	}
 	
-	//TODO: add graphics to code
 	public Scene guessLetter() {
 		/*This function will only have the user guess a letter.
 		We will be using 26 buttons (man this is daunting) and so we
@@ -402,13 +400,6 @@ public class WordGuessClient extends Application {
 							}
 						});
 						
-						//TODO: put a transparent waiting background on top
-						//	of the layout until the server spits back an updated
-						//	WordInfo object.
-						
-							
-						
-						
 					});
 					//Create VBox that will house the rows
 					VBox alphabetButtonLayout = new VBox();
@@ -452,8 +443,6 @@ public class WordGuessClient extends Application {
 									//clientConnection.send(curGuess); 
 								});
 							});
-							
-							
 					alphabetButtonLayout.getChildren().addAll(row1, row2, row3);
 					alphabetButtonLayout.setAlignment(Pos.CENTER);
 				userInputLayout.getChildren().addAll(alphabetButtonLayout, confirmButton);
@@ -462,6 +451,49 @@ public class WordGuessClient extends Application {
 				centerLayout.setAlignment(Pos.CENTER);
 		layout.setTop(topLayout);
 		layout.setCenter(centerLayout);
+		
+		Scene scene = new Scene(layout, WIDTH, HEIGHT);
+		return scene;
+	}
+
+	public Scene winLoseLayout(boolean didPlayerWin) {
+		VBox layout = new VBox();
+		layout.setSpacing(100);
+		layout.setStyle("-fx-background-color: burlywood");
+		
+		Text winLoseText = new Text();
+		winLoseText.setFont(NARRATION_FONT);
+		winLoseText.setTextAlignment(TextAlignment.CENTER);
+		winLoseText.setWrappingWidth(300);
+		
+		 if(didPlayerWin){
+			winLoseText.setText("You won, congratulations!");
+		 }
+		 else{
+			winLoseText.setText("You lost, better luck next time");
+		}
+		
+		HBox buttonLayout = new HBox();
+		buttonLayout.setSpacing(15);
+		
+		Button playAgainButton = new Button("Play Again");
+		Button exitButton = new Button("Exit Game");
+		
+		playAgainButton.setStyle("-fx-base: chocolate");
+		playAgainButton.setOnAction(e -> {
+			//TODO: reset clientConnection information and go to title page
+			window.setScene(sceneMap.get("title"));
+		});
+		exitButton.setStyle("-fx-base: firebrick");
+		exitButton.setOnAction(eo -> {
+			window.close();
+		});
+		
+		buttonLayout.getChildren().addAll(playAgainButton, exitButton);
+		buttonLayout.setAlignment(Pos.CENTER);
+		
+		layout.getChildren().addAll(winLoseText, buttonLayout);
+		layout.setAlignment(Pos.CENTER);
 		
 		Scene scene = new Scene(layout, WIDTH, HEIGHT);
 		return scene;
@@ -557,14 +589,17 @@ public class WordGuessClient extends Application {
 						case 1: 
 							System.out.println("1");
 							fruitImage.setDisable(true);
+							fruitImage.setOpacity(0.5);
 							break;
 						case 2:
 							System.out.println("2");
 							colorImage.setDisable(true);
+							colorImage.setOpacity(0.5);
 							break;
 						case 3:
 							System.out.println("3");
 							animalImage.setDisable(true);
+							animalImage.setOpacity(0.5);
 							break;
 						default:
 							
@@ -573,7 +608,7 @@ public class WordGuessClient extends Application {
 							break;
 					}
 					
-//TO DO: screen with play again and quit
+					window.setScene(winLoseLayout(true));
 					
 					enableKeyboard();
 					clientConnection.resetGuesses();
@@ -629,8 +664,8 @@ public class WordGuessClient extends Application {
 				   clientConnection.catLives.get(2) == 0) 
 				{
 				   System.out.println("Also Recieved: ran out of lives");
-//TO DO: screen with play again and quit
-					enableCategories();
+				   window.setScene(winLoseLayout(false));
+				   enableCategories();
 					
 				}
 				else 
@@ -812,6 +847,7 @@ public class WordGuessClient extends Application {
 	}
 	public void makeCategoryEvents() {
 		DropShadow shadow = makeShadow();
+		
 		fruitImage.setOnMouseClicked(e -> {
 			clientConnection.curCat = 1;
 			selectCategory(1);
@@ -822,6 +858,7 @@ public class WordGuessClient extends Application {
 		fruitImage.setOnMouseExited(e -> {
 			fruitImage.setEffect(null);
 		});
+		
 		colorImage.setOnMouseClicked(e -> {
 			clientConnection.curCat = 2;
 			selectCategory(2);
@@ -832,6 +869,7 @@ public class WordGuessClient extends Application {
 		colorImage.setOnMouseExited(e -> {
 			colorImage.setEffect(null);
 		});
+		
 		animalImage.setOnMouseClicked(e ->{
 			clientConnection.curCat = 3;
 			selectCategory(3);
