@@ -886,9 +886,7 @@ public class WordGuessClient extends Application {
 	public void selectPlayAgain() {
 		wordInfo = playAgainRequest();
 		clientConnection.send(wordInfo);
-		//TODO: Reset the player's guesses and 
-		//		things here since they want to 
-		//		play again
+		clientConnection.resetVariables();
 		try {
 			start(window);
 		} catch (Exception e) {
