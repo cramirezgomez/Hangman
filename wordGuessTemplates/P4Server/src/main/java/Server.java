@@ -63,7 +63,7 @@ public class Server {
 						//callback.accept("client has connected to server: " + "client #" + count);
 						
 						WordInfo temp = new WordInfo();
-						temp.serverMessage = "client has connected to server: " + "client #" + count;
+						temp.serverMessage = "Client has connected to server: " + "client #" + count;
 						callback.accept(temp);
 						
 						//Add a new client to the client list
@@ -231,9 +231,12 @@ public class Server {
 					try 
 					{
 						WordInfo temp =(WordInfo) in.readObject();
-						temp.serverMessage = "client: " + count + ": " + temp.serverMessage;
+						temp.serverMessage = "Client " + count + ": " + temp.serverMessage;
+						int curType = execLogic(temp);
 						callback.accept(temp);
-						execLogic(temp);
+						if(curType == 2 || curType == 1) {
+							break;
+						}
 				    	
 					}
 					//If someone Disconnects from the game
@@ -299,10 +302,21 @@ public class Server {
 				//client wants to play again
 				if(input.playAgain) 
 				{
+					
 					//If the player wants to play again reset their information
 					//and refill the word banks
 					resetWordBanks();
-					return 1;
+					try 
+					{
+						out.close();
+						in.close();
+						connection.close();
+						
+						//Remove the client from the clients array 
+						clients.remove(count - 1);
+						return 1;
+					}
+					catch(Exception e){ return 1;}
 				}
 				//client wants to quit
 				if(input.quit) 
@@ -323,11 +337,13 @@ public class Server {
 				//client guessed a char
 				if(input.guess != ' ') 
 				{
+					input.serverMessage = input.serverMessage + input.guess;
 					sendClientResponse(handleGuess(input));
 					return 3;
 				}
 				if(input.category != 0) 
 				{
+					input.serverMessage = input.serverMessage + input.category;
 					pickWordFromBank(input.category); 
 					WordInfo lengthInfo = prepareLength();
 					sendClientResponse(lengthInfo);

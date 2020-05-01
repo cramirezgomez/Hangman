@@ -116,14 +116,14 @@ HashMap<String, Scene> sceneMap;
 						WordInfo input = (WordInfo) data;
 						listItems.getItems().add(input.serverMessage);
 						
-						//Display Client Guess
+						/*//Display Client Guess
 						if(input.guess != ' ') {
 							listItems.getItems().add("Current Guess: " + input.guess);
 						}
 						//Display Client Category 
 						if(input.category != 0) {
 							listItems.getItems().add("Category picked: " + input.category);
-						}
+						}*/
 						
 					});
 				}, socketPort);;

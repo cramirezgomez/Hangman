@@ -524,16 +524,16 @@ public class WordGuessClient extends Application {
 	void gameLogic(WordInfo input) {
 		//keep track of categories cleared and guesses on client
 		++clientConnection.serverResponses;
-		System.out.println("num of server responses: " + clientConnection.serverResponses);
+		//System.out.println("num of server responses: " + clientConnection.serverResponses);
 		
 		//welcome message was sent
 		if(clientConnection.serverResponses == 1) 
 		{
-			System.out.println("Recieved: welcome message");
+			//System.out.println("Recieved: welcome message");
 		}
 		//length of the word is being sent
 		else if(input.wordLength != 0) {
-			System.out.println("Recieved: length of word is " + input.wordLength);
+			//System.out.println("Recieved: length of word is " + input.wordLength);
 			clientConnection.lettersLeft = input.wordLength;
 			clientConnection.curWord = "";
 			for(int i = 0; i < input.wordLength; ++i) {
@@ -546,7 +546,7 @@ public class WordGuessClient extends Application {
 		{
 			//our guesss was correct
 			if(input.isCorrect){
-				System.out.println("Recieved: guess was correct");
+				//System.out.println("Recieved: guess was correct");
 				clientConnection.lettersLeft = clientConnection.lettersLeft - input.positions.size();
 				input.positions.forEach(e -> {
 					clientConnection.curWord = clientConnection.curWord.substring(0, e) + Character.toUpperCase(wordInfo.guess) +
@@ -554,27 +554,27 @@ public class WordGuessClient extends Application {
 				});
 				//word was guessed
 				if(clientConnection.lettersLeft == 0) {
-					System.out.println("Recieved: word was guessed");
+					//System.out.println("Recieved: word was guessed");
 					switch(clientConnection.curCat)
 					{
 						case 1: 
-							System.out.println("1");
+							//System.out.println("1");
 							fruitImage.setDisable(true);
 							fruitImage.setOpacity(0.5);
 							break;
 						case 2:
-							System.out.println("2");
+							//System.out.println("2");
 							colorImage.setDisable(true);
 							colorImage.setOpacity(0.5);
 							break;
 						case 3:
-							System.out.println("3");
+							//System.out.println("3");
 							animalImage.setDisable(true);
 							animalImage.setOpacity(0.5);
 							break;
 						default:
 							
-							System.out.println("error");
+							//System.out.println("error");
 							//error
 							break;
 					}
@@ -586,12 +586,12 @@ public class WordGuessClient extends Application {
 					//game is won
 					if(colorImage.isDisabled() && fruitImage.isDisabled() && animalImage.isDisabled())
 					{
-						System.out.println("game was cleared");
+						//System.out.println("game was cleared");
 						enableCategories();
 					}
 					//cat is won
 					else {
-						System.out.println("cat cleared");
+						//System.out.println("cat cleared");
 						
 						window.setScene(sceneMap.get("select category"));
 						window.show();
@@ -608,7 +608,7 @@ public class WordGuessClient extends Application {
 			else {
 				--clientConnection.guesses;
 				narrationText.setText("Guess a letter. You have " + clientConnection.guesses + " guesses left.");
-				System.out.println("Recieved: guess was wrong");
+				//System.out.println("Recieved: guess was wrong");
 			}
 			
 			//ran out of guesses
@@ -634,14 +634,14 @@ public class WordGuessClient extends Application {
 				   clientConnection.catLives.get(1) == 0 || 
 				   clientConnection.catLives.get(2) == 0) 
 				{
-				   System.out.println("Also Recieved: ran out of lives");
+				   //System.out.println("Also Recieved: ran out of lives");
 				   window.setScene(sceneMap.get("lose layout"));
 				   enableCategories();
 					
 				}
 				else 
 				{
-					System.out.println("Also Recieved: ran out of guesses");
+					//System.out.println("Also Recieved: ran out of guesses");
 					window.setScene(sceneMap.get("select category"));
 					window.show();
 				}
@@ -903,25 +903,25 @@ public class WordGuessClient extends Application {
 	WordInfo categoryRequest(int x){
 		WordInfo tempObj = new WordInfo();
 		tempObj.category = x;
-		tempObj.serverMessage = "picked a category";
+		tempObj.serverMessage = "Picked category: ";
 		return tempObj;
 	}
 	WordInfo guessRequest(char x){
 		WordInfo tempObj = new WordInfo();
 		tempObj.guess = x;
-		tempObj.serverMessage = "sent a guess";
+		tempObj.serverMessage = "Sent guess: ";
 		return tempObj;
 	}
 	WordInfo playAgainRequest(){
 		WordInfo tempObj = new WordInfo();
 		tempObj.playAgain = true;
-		tempObj.serverMessage = "clicked play again";
+		tempObj.serverMessage = "Clicked play again";
 		return tempObj;
 	}
 	WordInfo quitRequest(){
 		WordInfo tempObj = new WordInfo();
 		tempObj.quit = true;
-		tempObj.serverMessage = "clicked quit";
+		tempObj.serverMessage = "Clicked quit";
 		return tempObj;
 	}
 		
