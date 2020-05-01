@@ -54,7 +54,7 @@ public class Client extends Thread{
 		
 	}
 	
-	//default contructor with values used in class
+	//default constructor with values used in class
 	Client(Consumer<Serializable> call)
 	{
 		callback = call;
@@ -89,6 +89,7 @@ public class Client extends Thread{
 		this.catCleared.add(false);
 		this.catCleared.add(false);
 		this.catCleared.add(false);
+		
 		this.guesses = 6;
 		
 		this.catLives.clear();

@@ -215,18 +215,6 @@ public class Server {
 				//while loop to read in from clients and update others
 				while(true)
 				{
-					
-					/* NOTE:
-					 * There is 3 different objects of WordInfo created
-					 *
-					 * 	1. temp
-					 *	2. curTurn
-					 *  3. newClient
-					 * 
-					 * 	Observe if they cause problems
-					 * 	
-					 */
-					
 					//Game Logic will be implemented here 
 					try 
 					{
@@ -314,9 +302,9 @@ public class Server {
 						
 						//Remove the client from the clients array 
 						clients.remove(count - 1);
-						return 1;
+						return 1; //Testing
 					}
-					catch(Exception e){ return 1;}
+					catch(Exception e){ return 1;} //Testing
 				}
 				//client wants to quit
 				if(input.quit) 
@@ -329,9 +317,9 @@ public class Server {
 						
 						//Remove the client from the clients array 
 						clients.remove(count - 1);
-						return 2;
+						return 2;//Testing
 					}
-					catch(Exception e){ return 2;}
+					catch(Exception e){ return 2;} //Testing
 					
 				}
 				//client guessed a char
@@ -339,7 +327,7 @@ public class Server {
 				{
 					input.serverMessage = input.serverMessage + input.guess;
 					sendClientResponse(handleGuess(input));
-					return 3;
+					return 3; //Testing
 				}
 				if(input.category != 0) 
 				{
@@ -348,7 +336,7 @@ public class Server {
 					WordInfo lengthInfo = prepareLength();
 					sendClientResponse(lengthInfo);
 					
-					return 4;
+					return 4; //Testing
 				}
 				 
 				return 0;
