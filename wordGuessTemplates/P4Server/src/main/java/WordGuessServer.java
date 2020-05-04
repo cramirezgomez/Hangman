@@ -58,16 +58,13 @@ HashMap<String, Scene> sceneMap;
 		portNumInfo.setEditable(false);
 		
 		portButton = new Button("Enter");
+		portButton.setStyle("-fx-background-color: #FFB6C1;");
+		
 		startServer = new Button("Start Server");
+		startServer.setStyle("-fx-background-color: #FFB6C1;");
+		
 		startServer.setDisable(true);
 		
-//		remove
-//		later
-//      ||||||
-//      VVVVVV
-		portNumber.setText("5555"); //Used to avoid entering 5555 all the time 
-		//-------------//
-
 		//---Server GUI--//
 		listItems = new ListView<String>();
 		listItems.setStyle("-fx-font-size: 25;"+"-fx-border-size: 20;"+ 
@@ -108,22 +105,9 @@ HashMap<String, Scene> sceneMap;
 				{
 					Platform.runLater(()->
 					{
-						/*
-							-> Here we would update the server on the status of certain players 
-							-> Should'nt be as much information as the last project
-						*/
 						
 						WordInfo input = (WordInfo) data;
 						listItems.getItems().add(input.serverMessage);
-						
-						/*//Display Client Guess
-						if(input.guess != ' ') {
-							listItems.getItems().add("Current Guess: " + input.guess);
-						}
-						//Display Client Category 
-						if(input.category != 0) {
-							listItems.getItems().add("Category picked: " + input.category);
-						}*/
 						
 					});
 				}, socketPort);;
@@ -163,18 +147,8 @@ HashMap<String, Scene> sceneMap;
 		
 		startPane.setCenter(v3);
 		
-		/*
-		//Create an object for the background image    
-		 Image dogEin = new Image("startGui.jpg");
-			
-		    //Set background size 
-			BackgroundSize aSize = new BackgroundSize(1.0, 1.0, true, true, false, false);
-			startPane.setBackground(new Background(new BackgroundImage(dogEin,
-		            BackgroundRepeat.NO_REPEAT,
-		            BackgroundRepeat.NO_REPEAT,
-		            BackgroundPosition.CENTER,
-		            aSize )));
-		*/
+		startPane.setStyle("-fx-background-color: #ADD8E6;");
+		
 		return new Scene(startPane, 850, 750);
 	}
 	
@@ -184,17 +158,8 @@ HashMap<String, Scene> sceneMap;
 		BorderPane serverPane = new BorderPane();
 		serverPane.setCenter(listItems);
 		
-		/*//Create an object for the background image    
-		Image edwardServer = new Image("serverGui.jpg");
+		serverPane.setStyle("-fx-background-color: #E6E6FA;");
 		
-	    //Set background size 
-		BackgroundSize bSize = new BackgroundSize(1.0, 1.0, true, true, false, false);
-		serverPane.setBackground(new Background(new BackgroundImage(edwardServer,
-	            BackgroundRepeat.NO_REPEAT,
-	            BackgroundRepeat.NO_REPEAT,
-	            BackgroundPosition.CENTER,
-	            bSize )));
-		*/
 		return new Scene(serverPane, 850, 750);
 	}
 
