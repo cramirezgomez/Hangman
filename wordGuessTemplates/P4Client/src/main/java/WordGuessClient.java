@@ -230,7 +230,12 @@ public class WordGuessClient extends Application {
 		btnConnect.setOnAction(e->{
 			//get our input for client
 			IPAddress = enterIP.getText();
+			
+			try {
 			portNum = Integer.parseInt(enterPort.getText());
+			}
+			catch(Exception a){}
+			
 			window.show();
 			
 			//Received a message from the server
@@ -890,7 +895,7 @@ public class WordGuessClient extends Application {
 		}
 	}
 	public void selectQuit() {
-		wordInfo = playAgainRequest();
+		wordInfo = quitRequest();
 		clientConnection.send(wordInfo);
 		window.close();
 	}
