@@ -213,10 +213,6 @@ public class WordGuessClient extends Application {
 		TextField enterPort = new TextField();
 		Button btnConnect = new Button("Connect");
 		
-		//set default values in box for faster testing
-		enterIP.setText("127.0.0.1");
-		enterPort.setText("5555");
-		
 		//create boxes to format things
 		VBox col1 = new VBox(labIP, enterIP, labPort, enterPort);
 		col1.setSpacing(10);
