@@ -628,7 +628,7 @@ public class WordGuessClient extends Application {
 				
 				enableKeyboard();
 			   	clientConnection.resetGuesses();
-			   	
+			   	narrationText.setText("Guess a letter. You have " + clientConnection.guesses + " guesses left.");
 				//ran out of lives
 				if(clientConnection.catLives.get(0) == 0 || 
 				   clientConnection.catLives.get(1) == 0 || 
